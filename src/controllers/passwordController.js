@@ -1,0 +1,102 @@
+//src/controllers/passwordController.js
+
+const User = require('../models/signupModel');
+const ForgotPasswordRequest = require('../models/forgotPasswordModel');
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
+const brevo = require('@getbrevo/brevo');
+require('dotenv').config();
+
+// Configure Brevo client
+const apiInstance = new brevo.TransactionalEmailsApi();
+apiInstance.setApiKey(
+  brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
+
+// Step 1: Create ForgotPasswordRequest and send email
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const id = uuidv4();
+
+    await ForgotPasswordRequest.create({
+      id,
+      UserId: user.id,
+      isActive: true
+    });
+
+    const resetURL = `http://localhost:3000/password/resetpassword/${id}`;
+
+    // ✅ Send email using Brevo
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = "Password Reset Link";
+    sendSmtpEmail.htmlContent = `<p>Click the link below to reset your password:</p><a href="${resetURL}">${resetURL}</a>`;
+    sendSmtpEmail.sender = { name: "Expense Tracker", email: "mohd.atif2531@gmail.com" };
+    sendSmtpEmail.to = [{ email: user.email }];
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+
+    res.json({ message: 'Password reset link has been sent to your email' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Step 2: Show Reset Password Form
+exports.getResetPasswordForm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const request = await ForgotPasswordRequest.findByPk(id);
+
+    if (!request || !request.isActive) {
+      return res.status(400).send('Invalid or expired reset link');
+    }
+
+    res.send(`
+      <form action="/password/resetpassword/${id}" method="POST">
+        <input type="password" name="newPassword" placeholder="Enter new password" required />
+        <button type="submit">Reset Password</button>
+      </form>
+    `);
+  } catch (error) {
+    res.status(500).send('Server error');
+  }
+};
+
+// Step 3: Update Password and deactivate request
+exports.postResetPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    const request = await ForgotPasswordRequest.findByPk(id);
+
+    if (!request || !request.isActive) {
+      return res.status(400).send('Invalid or expired reset link');
+    }
+
+    const user = await User.findByPk(request.UserId);
+
+    if (!user) {
+      return res.status(404).send('User not found for this reset link');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    request.isActive = false;
+    await request.save();
+
+    res.send('Password updated successfully! You can now log in.');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+};

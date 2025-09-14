@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script> <!-- for cashfree Payment -->
+
+</head>
+<body>
+
+    <div id="premiumUser">
+
+    </div>
+    <form onsubmit="home(event)">
+
+        <label for="amount">Expense Amount: </label>
+        <input type="number" name="amount" id="amount">
+
+        <label for="description">Description</label>
+        <input type="text" name="description" id="description">
+
+        <label for="category">Category</label>
+        <select name="category" id="category">
+            <option value="food">Food</option>
+            <option value="fuel">Fuel</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="rent">Rent</option>
+            <option value="travel">Travel</option>
+        </select>
+
+        <button type="submit">Add Expense</button>
+    </form>
+
+
+    <div class="row">
+            <button id="renderBtn">Buy Premium</button>
+    </div>
+
+    <div>
+        <h3>Expense List</h3>
+        <ul id="expenseList">
+
+        </ul>
+    </div>
+      
+    <div id ="leaderBtn"></div>
+     <ul id="leaderboard"></ul>
+
+
+ 
+    <script src="./JS/home.js"></script>
+</body>
+</html>
