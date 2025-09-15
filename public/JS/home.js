@@ -93,83 +93,122 @@ async function display() {
         console.error("Unable to fetch data to display", error);
     }
 
-
-//premium user check and feature display
-   try {
-    const result = await fetch("http://localhost:3000/premium/status", {
-        headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if(result.ok){
-        const data = await result.json();
-
-        if(data.status === "SUCCESSFUL"){
-
-            // Hide "Buy Premium" button
-           const buyPremiumBtn = document.querySelector("#renderBtn");
-           if (buyPremiumBtn) buyPremiumBtn.style.display = "none";
-
-            const premiumHeader = document.querySelector("#premiumUser");
-            premiumHeader.innerHTML = `<p>You are a premium user now</p>`;
-
-            
-
-            const leaderBoardBtn = document.createElement("button");
-            leaderBoardBtn.textContent = "Show LeaderBoard";
-
-            const leaderBoardHeading = document.createElement("h3");
-            leaderBoardHeading.textContent ="LeaderBoard";
-
-            const leaderBtn = document.querySelector("#leaderBtn")
-
-            
-            leaderBtn.appendChild(leaderBoardBtn);
-           
-
-            leaderBoardBtn.onclick = async () => {
-                leaderBtn.appendChild(leaderBoardHeading);
-                
-                try {
-                    const res = await fetch("http://localhost:3000/premium/leaderboard");
-                    
-                    if(res.ok) {
-                        const data = await res.json();
-                        const ul = document.getElementById("leaderboard");
-                        ul.innerHTML = ""; // clear old list
-
-                        data.forEach(user => {
-                            const li = document.createElement("li");
-                            li.textContent = `${user.name} || ₹${user.totalExpense}`;
-                            ul.appendChild(li);
-                        });
-                    } else {
-                        console.error("Failed to fetch leaderboard:", res.status);
-                        alert("Failed to fetch leaderboard.");
-                    }
-                } catch(err) {
-                    console.error("Error:", err);
-                    alert("Unable to fetch Leaderboard");
-                }
-            };
-        }
-    }
-
-  } catch (error) {
-    console.error("Unable to fetch premium user status to display", error);
-    }
-
-
+    premiumFeatures();
 }
-
-
-
 
 display(); // initial call to display expenses
 
 
 
+//  PREMIUM USER CHECK AND FEATURES DISPLAY
 
-// buy premium button
+ async function premiumFeatures() {
+    const token = localStorage.getItem("token");
+
+    try {
+        const result = await fetch("http://localhost:3000/premium/status", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!result.ok) {
+            console.log("Request failed, not running premiumFeatures");
+            return;
+        }
+
+        const data = await result.json();
+
+        if (data.status !== "SUCCESSFUL") {
+            console.log("User is not premium — stopping premiumFeatures execution");
+            return;
+        }
+
+        // ✅ User is premium now
+        const buyPremiumBtn = document.querySelector("#renderBtn");
+        if (buyPremiumBtn) buyPremiumBtn.style.display = "none";
+
+        const premiumHeader = document.querySelector("#premiumUser");
+        premiumHeader.innerHTML = `<p>You are a premium user now</p>`; 
+
+        const leaderBtn = document.querySelector("#leaderBtn");
+        const leaderBoardBtn = document.createElement("button");
+        leaderBoardBtn.textContent = "Show LeaderBoard";
+
+        const leaderBoardHeading = document.createElement("h3");
+        leaderBoardHeading.textContent = "LeaderBoard";
+
+        leaderBtn.appendChild(leaderBoardBtn);
+
+        generateReport(); 
+
+        leaderBoardBtn.onclick = async () => {
+            leaderBtn.appendChild(leaderBoardHeading);
+            try {
+                const res = await fetch("http://localhost:3000/premium/leaderboard");
+
+                if (!res.ok) {
+                    console.error("Failed to fetch leaderboard:", res.status);
+                    alert("Failed to fetch leaderboard.");
+                    return;
+                }
+
+                const data = await res.json();
+                const ul = document.getElementById("leaderboard");
+                ul.innerHTML = "";
+
+                data.forEach(user => {
+                    const li = document.createElement("li");
+                    li.textContent = `${user.name} || ₹${user.totalExpense}`;
+                    ul.appendChild(li);
+                });
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Unable to fetch Leaderboard");
+            }
+        };
+    } catch (error) {
+        console.error("Network error — unable to fetch premium status", error);
+    }
+}
+
+
+// GENERATE REPORT FOR USER
+
+async function generateReport() {
+    // Create container for salary input and button
+    const reportContainer = document.createElement("div");
+
+    // Create salary input
+    const salaryInput = document.createElement("input");
+    salaryInput.type = "number";
+    salaryInput.placeholder = "Enter your monthly salary";
+    salaryInput.id = "salaryInput";
+
+    // Create generate report button
+    const reportBtn = document.createElement("button");
+    reportBtn.textContent = "Generate Report";
+
+    reportBtn.onclick = () => {
+        const salary = salaryInput.value.trim();
+        if (!salary) {
+            alert("Please enter your salary first.");
+            return;
+        }
+        localStorage.setItem("userSalary", salary); // store salary to access later
+        window.location.href = "report.html"; // go to the report page
+    };
+
+    // Append input and button to the container
+    reportContainer.appendChild(salaryInput);
+    reportContainer.appendChild(reportBtn);
+
+    // Append the container to your existing reportDiv
+    document.getElementById("reportDiv").appendChild(reportContainer);
+}
+
+
+
+
+// BUY PREMIUM BUTTON
 
 document.getElementById("renderBtn").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
