@@ -1,93 +1,131 @@
+let currentPage = 1;
+const limit = 10;
+let totalPages = 1;
+
 document.addEventListener("DOMContentLoaded", () => {
-  const filterSelect = document.getElementById("filterSelect");
-  const generateBtn = document.getElementById("generateReportBtn");
-  const downloadBtn = document.getElementById("downloadBtn");
-  const reportTableBody = document.getElementById("reportTableBody");
-
-  const salary = localStorage.getItem("userSalary") || "N/A";
-  document.getElementById("salaryValue").textContent = salary;
-
-  // Helper: get week number
-  function getWeekNumber(d) {
-    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-  }
-
-  // Filter expenses
-  function filterExpenses(data, period) {
-    const now = new Date();
-    return data.filter(item => {
-      const createdAt = new Date(item.createdAt);
-
-      if (period === "daily") {
-        return createdAt.toDateString() === now.toDateString();
-      }
-      if (period === "weekly") {
-        return (
-          createdAt.getFullYear() === now.getFullYear() &&
-          getWeekNumber(createdAt) === getWeekNumber(now)
-        );
-      }
-      if (period === "monthly") {
-        return (
-          createdAt.getFullYear() === now.getFullYear() &&
-          createdAt.getMonth() === now.getMonth()
-        );
-      }
-      return true;
-    });
-  }
-
-  // Render table
-  function renderTable(data) {
-    reportTableBody.innerHTML = "";
-    data.forEach(item => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${item.description}</td>
-        <td>${item.amount}</td>
-        <td>${item.category}</td>
-        <td>${new Date(item.createdAt).toLocaleDateString()}</td>
-      `;
-      reportTableBody.appendChild(tr);
-    });
-  }
-
-  // Generate report
-  generateBtn.addEventListener("click", async () => {
-    try {
-      const res = await fetch("/expenses");
-      const data = await res.json();
-      const filter = filterSelect.value;
-
-      const filtered = filterExpenses(data, filter);
-      renderTable(filtered);
-    } catch (err) {
-      console.error(err);
-    }
-  });
-
-  // Download CSV
-  downloadBtn.addEventListener("click", () => {
-    let csv = "Description,Amount,Category,Date\n";
-    const rows = reportTableBody.querySelectorAll("tr");
-
-    rows.forEach(row => {
-      const cols = row.querySelectorAll("td");
-      const rowData = Array.from(cols).map(td => td.textContent).join(",");
-      csv += rowData + "\n";
-    });
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "report.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
+    fetchExpenses(); // Fetch initial report on page load
 });
+
+document.getElementById("generateReportBtn").addEventListener("click", () => {
+    currentPage = 1;
+    fetchExpenses();
+});
+
+document.getElementById("downloadBtn").addEventListener("click", downloadCSV);
+
+document.getElementById("prevPageBtn").addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        fetchExpenses();
+    }
+});
+
+document.getElementById("nextPageBtn").addEventListener("click", () => {
+    if (currentPage < totalPages) {
+        currentPage++;
+        fetchExpenses();
+    }
+});
+
+async function fetchExpenses() {
+    const token = localStorage.getItem("token");
+    const filter = document.getElementById("filterSelect").value;
+    const salary = localStorage.getItem("userSalary") || "0";
+    const pageIndicator = document.getElementById("pageIndicator");
+    pageIndicator.textContent = "Loading...";
+
+    try {
+        const res = await fetch(
+            `http://localhost:3000/report/paginated-and-filtered?page=${currentPage}&limit=${limit}&filter=${filter}&salary=${salary}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || "Failed to fetch report");
+        }
+
+        const data = await res.json();
+        totalPages = data.totalPages;
+        renderTableAndSummary(data);
+        updatePageIndicator(totalPages);
+
+    } catch (err) {
+        console.error(err);
+        alert(err.message || "Unable to fetch report data.");
+        pageIndicator.textContent = "Error";
+        document.getElementById("reportTableBody").innerHTML = '<tr><td colspan="4">Error loading data.</td></tr>';
+    }
+}
+
+function renderTableAndSummary(data) {
+    const { expenses, totalMonthlyExpense, savings } = data;
+    const salary = localStorage.getItem("userSalary") || "0";
+    const tbody = document.getElementById("reportTableBody");
+    const summaryDiv = document.getElementById("monthlySummary");
+    
+    tbody.innerHTML = ""; 
+    summaryDiv.innerHTML = "";
+
+    // If it's a monthly report, display the summary
+    if (typeof savings !== 'undefined') {
+        summaryDiv.innerHTML = `
+            <div style="background-color: #f0f8ff; border: 1px solid #d1e7fd; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                <strong>Monthly Summary:</strong> 
+                Salary (₹${parseFloat(salary).toFixed(2)}) - 
+                Total Expenses (₹${totalMonthlyExpense.toFixed(2)}) = 
+                <strong>Savings (₹${savings.toFixed(2)})</strong>
+            </div>
+        `;
+    }
+
+    if (!expenses || expenses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">No expenses found for this period.</td></tr>';
+        return;
+    }
+
+    expenses.forEach((exp) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${exp.amount}</td>
+            <td>${exp.description}</td>
+            <td>${exp.category}</td>
+            <td>${new Date(exp.createdAt).toLocaleDateString()}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function updatePageIndicator(totalPages) {
+    document.getElementById("pageIndicator").textContent = `Page ${currentPage} of ${totalPages}`;
+    document.getElementById("prevPageBtn").disabled = (currentPage <= 1);
+    document.getElementById("nextPageBtn").disabled = (currentPage >= totalPages);
+}
+
+async function downloadCSV() {
+    const token = localStorage.getItem("token");
+    const filter = document.getElementById("filterSelect").value;
+    const salary = localStorage.getItem("userSalary") || "0";
+
+    try {
+        const res = await fetch(
+            `http://localhost:3000/report/download?filter=${filter}&salary=${salary}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (!res.ok) throw new Error("Failed to download CSV.");
+        
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "expense_report.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
+}
