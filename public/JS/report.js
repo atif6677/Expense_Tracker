@@ -1,5 +1,4 @@
 let currentPage = 1;
-const limit = 10;
 let totalPages = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -27,10 +26,16 @@ document.getElementById("nextPageBtn").addEventListener("click", () => {
     }
 });
 
+document.getElementById("rowsPerPage").addEventListener("change", () => {
+    currentPage = 1;
+    fetchExpenses();
+});
+
 async function fetchExpenses() {
     const token = localStorage.getItem("token");
     const filter = document.getElementById("filterSelect").value;
     const salary = localStorage.getItem("userSalary") || "0";
+    const limit = document.getElementById("rowsPerPage").value; // 👈 get selected value
     const pageIndicator = document.getElementById("pageIndicator");
     pageIndicator.textContent = "Loading...";
 
@@ -67,7 +72,6 @@ function renderTableAndSummary(data) {
     tbody.innerHTML = ""; 
     summaryDiv.innerHTML = "";
 
-    // If it's a monthly report, display the summary
     if (typeof savings !== 'undefined') {
         summaryDiv.innerHTML = `
             <div style="background-color: #f0f8ff; border: 1px solid #d1e7fd; padding: 10px; border-radius: 5px; margin-top: 10px;">

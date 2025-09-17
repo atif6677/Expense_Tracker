@@ -2,7 +2,7 @@
 
 const axios = require("axios");
 
-exports.createOrder = async (orderId, orderAmount, customerId, customerPhone, customerEmail) => {
+const createOrder = async (orderId, orderAmount, customerId, customerPhone, customerEmail) => {
   try {
     const response = await axios.post(
       "https://sandbox.cashfree.com/pg/orders",
@@ -36,7 +36,7 @@ exports.createOrder = async (orderId, orderAmount, customerId, customerPhone, cu
   }
 };
 
-exports.getPaymentStatus = async (orderId) => {
+const getPaymentStatus = async (orderId) => {
   try {
     const response = await axios.get(
       `https://sandbox.cashfree.com/pg/orders/${orderId}`,
@@ -54,4 +54,10 @@ exports.getPaymentStatus = async (orderId) => {
     console.error("Error fetching Cashfree payment status:", error.response?.data || error.message);
     return "FAILED";
   }
+};
+
+// ✅ Export all at the end
+module.exports = {
+  createOrder,
+  getPaymentStatus
 };

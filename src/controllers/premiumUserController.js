@@ -2,9 +2,9 @@
 
 const Order = require("../models/orderModel");
 const User = require("../models/signupModel");
-// No longer need Expense or Sequelize here for the leaderboard!
 
-exports.premiumContent = async (req, res) => {
+// Check if the user has premium content access
+const premiumContent = async (req, res) => {
   try {
     const userStatus = await Order.findOne({
       where: { UserId: req.user.userId, status: "SUCCESSFUL" }
@@ -21,16 +21,15 @@ exports.premiumContent = async (req, res) => {
   }
 };
 
-exports.leaderboard = async (req, res) => {
+// Fetch leaderboard based on total expenses
+const leaderboard = async (req, res) => {
   try {
-    // ✅ This is the new, highly efficient query!
     const leaderboard = await User.findAll({
       attributes: [
         "name",
-        // Alias 'totalExpenses' to 'totalExpense' to match the front-end's expectation
-        ["totalExpenses", "totalExpense"] 
+        ["totalExpenses", "totalExpense"] // Alias to match front-end expectation
       ],
-      order: [["totalExpenses", "DESC"]] // Order by the pre-calculated column
+      order: [["totalExpenses", "DESC"]]
     });
 
     res.json(leaderboard);
@@ -39,3 +38,5 @@ exports.leaderboard = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch leaderboard" });
   }
 };
+
+module.exports = { premiumContent, leaderboard };

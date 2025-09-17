@@ -1,5 +1,3 @@
-//src/controllers/passwordController.js
-
 const User = require('../models/signupModel');
 const ForgotPasswordRequest = require('../models/forgotPasswordModel');
 const bcrypt = require('bcrypt');
@@ -15,7 +13,7 @@ apiInstance.setApiKey(
 );
 
 // Step 1: Create ForgotPasswordRequest and send email
-exports.forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -49,7 +47,7 @@ exports.forgotPassword = async (req, res) => {
 };
 
 // Step 2: Show Reset Password Form
-exports.getResetPasswordForm = async (req, res) => {
+const getResetPasswordForm = async (req, res) => {
   try {
     const { id } = req.params;
     const request = await ForgotPasswordRequest.findByPk(id);
@@ -70,7 +68,7 @@ exports.getResetPasswordForm = async (req, res) => {
 };
 
 // Step 3: Update Password and deactivate request
-exports.postResetPassword = async (req, res) => {
+const postResetPassword = async (req, res) => {
   try {
     const { id } = req.params;
     const { newPassword } = req.body;
@@ -100,3 +98,5 @@ exports.postResetPassword = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+module.exports = { forgotPassword, getResetPasswordForm, postResetPassword };

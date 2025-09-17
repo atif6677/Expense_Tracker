@@ -1,10 +1,13 @@
 // src/routes/reportRoute.js
 const express = require('express');
 const router = express.Router();
-const reportController = require('../controllers/reportController');
 const authenticate = require('../middleware/auth');
+const { getReportExpenses, downloadExpenses } = require('../controllers/reportController');
 
-router.get('/paginated-and-filtered', authenticate, reportController.getReportExpenses);
-router.get('/download', authenticate, reportController.downloadExpenses);
+// Get paginated and filtered expenses
+router.get('/paginated-and-filtered', authenticate, getReportExpenses);
+
+// Download expenses as CSV
+router.get('/download', authenticate, downloadExpenses);
 
 module.exports = router;

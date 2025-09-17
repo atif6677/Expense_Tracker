@@ -1,11 +1,12 @@
-const premiumUserController = require("../controllers/premiumUserController");
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
+const { premiumContent, leaderboard } = require("../controllers/premiumUserController");
 
+// Check if user has premium content access
+router.get("/status", auth, premiumContent);
 
-router.get("/status",auth,premiumUserController.premiumContent);
-router.get("/leaderboard",premiumUserController.leaderboard);
+// Get the leaderboard
+router.get("/leaderboard", leaderboard);
 
-
-module.exports =router;
+module.exports = router;
