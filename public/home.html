@@ -1,56 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
 <body>
 
-    <div id="premiumUser">
+  <div id="premiumUser"></div>
 
-    </div>
-    <form onsubmit="home(event)">
+  <form onsubmit="home(event)">
+      <label for="amount">Expense Amount: </label>
+      <input type="number" name="amount" id="amount">
 
-        <label for="amount">Expense Amount: </label>
-        <input type="number" name="amount" id="amount">
+      <label for="description">Description</label>
+      <input type="text" name="description" id="description">
 
-        <label for="description">Description</label>
-        <input type="text" name="description" id="description">
+      <label for="category">Category</label>
+      <select name="category" id="category">
+          <option value="food">Food</option>
+          <option value="fuel">Fuel</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="rent">Rent</option>
+          <option value="travel">Travel</option>
+      </select>
 
-        <label for="category">Category</label>
-        <select name="category" id="category">
-            <option value="food">Food</option>
-            <option value="fuel">Fuel</option>
-            <option value="entertainment">Entertainment</option>
-            <option value="rent">Rent</option>
-            <option value="travel">Travel</option>
-        </select>
+      <button type="submit">Add Expense</button>
+  </form>
 
-        <button type="submit">Add Expense</button>
-    </form>
+  <div class="row">
+      <button id="renderBtn">Buy Premium</button>
+  </div>
 
+  <div>
+      <h3>Expense List</h3>
 
-    <div class="row">
-            <button id="renderBtn">Buy Premium</button>
-    </div>
+      <label for="rowsPerPage">Rows per page: </label>
+      <select id="rowsPerPage">
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+          <option value="40">40</option>
+      </select>
 
-    <div>
-        <h3>Expense List</h3>
-        <ul id="expenseList">
+      <ul id="expenseList"></ul>
 
-        </ul>
-    </div>
-      
-     <div id ="leaderBtn"></div>
-     <ul id="leaderboard"></ul>
+      <div>
+          <button id="prevBtn">Prev</button>
+          <span id="pageInfo"></span>
+          <button id="nextBtn">Next</button>
+      </div>
+  </div>
 
-     <div id= "reportDiv"></div>
+  <div id="leaderBtn"></div>
+  <ul id="leaderboard"></ul>
 
+  <div id="reportDiv"></div>
 
- 
-    <script src="./JS/home.js"></script>
+  <script src="./JS/home.js"></script>
 </body>
 </html>

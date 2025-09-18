@@ -41,16 +41,37 @@ const addExpense = async (req, res) => {
   }
 };
 
+
 const getExpense = async (req, res) => {
   try {
-    const expenses = await Expense.findAll({
-      where: { userId: req.user.userId },
+    const userId = req.user.userId;
+
+    // Read pagination query params (default page=1, limit=10)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Get paginated expenses + total count
+    const { rows: expenses, count: totalExpenses } = await Expense.findAndCountAll({
+      where: { userId },
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']] // newest first
     });
-    res.status(200).json({ expenses });
+
+    // Send data + meta info for pagination
+    res.status(200).json({
+      expenses,
+      totalExpenses,
+      currentPage: page,
+      totalPages: Math.ceil(totalExpenses / limit)
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 const deleteExpense = async (req, res) => {
   // Start a transaction
