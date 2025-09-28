@@ -1,4 +1,5 @@
 let expenses = [];
+
 let currentPage = 1;
 let rowsPerPage = 10;
 let totalPages = 1;
@@ -17,27 +18,22 @@ async function home(event) {
     const token = localStorage.getItem("token");
 
     try {
-        const res = await fetch("http://localhost:3000/home", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ amount, description, category })
-        });
+        const res = await axios.post("http://localhost:3000/home", 
+            { amount, description, category }, 
+            { headers: { "Authorization": `Bearer ${token}` } }
+        );
 
-        const data = await res.json();
-
-        if (res.ok) {
-            alert("Expense added successfully");
-            await fetchExpenses(); 
-            renderTable();
-        } else {
-            alert(data.error || "Failed to add expense.");
-        }
+        alert("Expense added successfully");
+        await fetchExpenses();
+        renderTable();
+        
     } catch (err) {
         console.error("Error:", err);
-        alert("Something went wrong!");
+        if (err.response) {
+            alert(err.response.data.error || "Failed to add expense.");
+        } else {
+            alert("Something went wrong!");
+        }
     }
 
     amountInput.value = "";
@@ -48,19 +44,19 @@ async function home(event) {
 async function fetchExpenses() {
     const token = localStorage.getItem("token");
     try {
-        const res = await fetch(`http://localhost:3000/home?page=${currentPage}&limit=${rowsPerPage}`, {
+        const res = await axios.get("http://localhost:3000/home", {
+            params: { page: currentPage, limit: rowsPerPage },
             headers: { "Authorization": `Bearer ${token}` }
         });
-
-        const data = await res.json();
-        if (res.ok) {
-            expenses = data.expenses || [];
-            totalPages = data.totalPages || 1;
-        } else {
-            console.error("Failed to fetch expenses:", data.error || data.message);
-        }
+        
+        expenses = res.data.expenses || [];
+        totalPages = res.data.totalPages || 1;
+        
     } catch (err) {
         console.error("Unable to fetch data", err);
+        if (err.response) {
+            console.error("Failed to fetch expenses:", err.response.data.error || err.response.data.message);
+        }
     }
 }
 
@@ -99,22 +95,21 @@ async function deleteExpense(id, li) {
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
     try {
-        const res = await fetch(`http://localhost:3000/home/${id}`, {
-            method: "DELETE",
+        await axios.delete(`http://localhost:3000/home/${id}`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
-        if (res.ok) {
-            li.remove();
+        
+        li.remove();
 
-            // ✅ Check if current page became empty
-            const remaining = document.querySelectorAll(".expense-item").length;
-            if (remaining === 0 && currentPage > 1) {
-                currentPage--;
-            }
-
-            await fetchExpenses();
-            renderTable();
+        // ✅ Check if current page became empty
+        const remaining = document.querySelectorAll(".expense-item").length;
+        if (remaining === 0 && currentPage > 1) {
+            currentPage--;
         }
+
+        await fetchExpenses();
+        renderTable();
+
     } catch (err) {
         console.error("Error:", err);
         alert("Something went wrong!");
@@ -151,27 +146,25 @@ async function display() {
     premiumFeatures();
 }
 
-display(); 
+display();
 
 // ----------------- PREMIUM USER CHECK AND FEATURES -------------------
 async function premiumFeatures() {
     const token = localStorage.getItem("token");
 
     try {
-        const result = await fetch("http://localhost:3000/premium/status", {
+        const result = await axios.get("http://localhost:3000/premium/status", {
             headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (!result.ok) return;
-
-        const data = await result.json();
+        const data = result.data;
         if (data.status !== "SUCCESSFUL") return;
 
         const buyPremiumBtn = document.querySelector("#renderBtn");
         if (buyPremiumBtn) buyPremiumBtn.style.display = "none";
 
         const premiumHeader = document.querySelector("#premiumUser");
-        premiumHeader.innerHTML = `<p>You are a premium user now</p>`; 
+        premiumHeader.innerHTML = `<p>You are a premium user now</p>`;
 
         const leaderBtn = document.querySelector("#leaderBtn");
         const leaderBoardBtn = document.createElement("button");
@@ -182,13 +175,13 @@ async function premiumFeatures() {
 
         leaderBtn.appendChild(leaderBoardBtn);
 
-        generateReport(); 
+        generateReport();
 
         leaderBoardBtn.onclick = async () => {
             leaderBtn.appendChild(leaderBoardHeading);
             try {
-                const res = await fetch("http://localhost:3000/premium/leaderboard");
-                const data = await res.json();
+                const res = await axios.get("http://localhost:3000/premium/leaderboard");
+                const data = res.data;
                 const ul = document.getElementById("leaderboard");
                 ul.innerHTML = "";
 
@@ -236,64 +229,61 @@ async function generateReport() {
 // ----------------- BUY PREMIUM BUTTON -------------------
 
 document.getElementById("renderBtn").addEventListener("click", async () => {
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  try {
-    // 1️⃣ Create order on backend
-    const res = await fetch('http://localhost:3000/payment/premium', {
-      method: 'GET',
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+    try {
+        // 1️⃣ Create order on backend
+        const res = await axios.get('http://localhost:3000/payment/premium', {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed to create order');
+        const data = res.data;
 
-    // ✅ Get payment_session_id and orderId from backend
-    const { payment_session_id, order } = data;
-    if (!payment_session_id || !order?.orderId) {
-      throw new Error("Invalid order data from server");
+        // ✅ Get payment_session_id and orderId from backend
+        const { payment_session_id, order } = data;
+        if (!payment_session_id || !order?.orderId) {
+            throw new Error("Invalid order data from server");
+        }
+
+        const orderId = order.orderId;
+
+        // 2️⃣ Initialize Cashfree Drop-in
+        const cashfree = new Cashfree({ mode: "sandbox" });
+
+        cashfree.checkout({
+            paymentSessionId: payment_session_id,
+
+            onSuccess: async (result) => {
+                console.log("Payment success data:", result);
+
+                // ✅ Update backend for successful payment
+                await axios.get(`http://localhost:3000/payment/updateTransactionStatus?order_id=${orderId}`);
+                
+                alert("Transaction Successful ✅");
+            },
+
+            onFailure: async (err) => {
+                console.error("Payment failed:", err);
+
+                // ✅ Update backend to mark order as FAILED
+                await axios.post('http://localhost:3000/payment/updateTransactionStatus', 
+                    { order_id: orderId }, 
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+                
+                alert("Transaction Failed ❌");
+            }
+        });
+
+    } catch (err) {
+        console.error("Error starting payment:", err);
+        const message = err.response?.data?.error || err.message;
+        alert("Error starting payment: " + message);
     }
-
-    const orderId = order.orderId;
-
-    // 2️⃣ Initialize Cashfree Drop-in
-    const cashfree = new Cashfree({ mode: "sandbox" });
-
-    cashfree.checkout({
-      paymentSessionId: payment_session_id,
-
-      onSuccess: async (result) => {
-        console.log("Payment success data:", result);
-
-        // ✅ Update backend for successful payment
-        await fetch(`http://localhost:3000/payment/updateTransactionStatus?order_id=${orderId}`, {
-          method: 'GET'
-        });
-
-        alert("Transaction Successful ✅");
-      },
-
-      onFailure: async (err) => {
-        console.error("Payment failed:", err);
-
-        // ✅ Update backend to mark order as FAILED
-        await fetch('http://localhost:3000/payment/updateTransactionStatus', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ order_id: orderId })
-        });
-
-        alert("Transaction Failed ❌");
-      }
-    });
-
-  } catch (err) {
-    console.error("Error starting payment:", err);
-    alert("Error starting payment: " + err.message);
-  }
 });

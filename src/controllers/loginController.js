@@ -1,3 +1,4 @@
+// src/controllers/loginController.js
 const User = require("../models/signupModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");

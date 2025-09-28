@@ -1,3 +1,5 @@
+//public/JS/report.js
+
 let currentPage = 1;
 let totalPages = 1;
 
@@ -35,29 +37,30 @@ async function fetchExpenses() {
     const token = localStorage.getItem("token");
     const filter = document.getElementById("filterSelect").value;
     const salary = localStorage.getItem("userSalary") || "0";
-    const limit = document.getElementById("rowsPerPage").value; // 👈 get selected value
+    const limit = document.getElementById("rowsPerPage").value;
     const pageIndicator = document.getElementById("pageIndicator");
     pageIndicator.textContent = "Loading...";
 
     try {
-        const res = await fetch(
-            `http://localhost:3000/report/paginated-and-filtered?page=${currentPage}&limit=${limit}&filter=${filter}&salary=${salary}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get("http://localhost:3000/report/paginated-and-filtered", {
+            params: {
+                page: currentPage,
+                limit: limit,
+                filter: filter,
+                salary: salary,
+            },
+            headers: { Authorization: `Bearer ${token}` }
+        });
 
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error || "Failed to fetch report");
-        }
-
-        const data = await res.json();
+        const data = res.data;
         totalPages = data.totalPages;
         renderTableAndSummary(data);
         updatePageIndicator(totalPages);
 
     } catch (err) {
         console.error(err);
-        alert(err.message || "Unable to fetch report data.");
+        const message = err.response?.data?.error || "Unable to fetch report data.";
+        alert(message);
         pageIndicator.textContent = "Error";
         document.getElementById("reportTableBody").innerHTML = '<tr><td colspan="4">Error loading data.</td></tr>';
     }
@@ -112,14 +115,16 @@ async function downloadCSV() {
     const salary = localStorage.getItem("userSalary") || "0";
 
     try {
-        const res = await fetch(
-            `http://localhost:3000/report/download?filter=${filter}&salary=${salary}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        if (!res.ok) throw new Error("Failed to download CSV.");
+        const res = await axios.get("http://localhost:3000/report/download", {
+            params: {
+                filter: filter,
+                salary: salary,
+            },
+            headers: { Authorization: `Bearer ${token}` },
+            responseType: 'blob' // Important for file downloads
+        });
         
-        const blob = await res.blob();
+        const blob = res.data;
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -130,6 +135,6 @@ async function downloadCSV() {
         URL.revokeObjectURL(url);
     } catch (err) {
         console.error(err);
-        alert(err.message);
+        alert(err.message || "Failed to download CSV.");
     }
 }

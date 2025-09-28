@@ -1,5 +1,6 @@
 
-// signup.js
+// public/JS/signup.js
+
 async function signup(event) {
     event.preventDefault();
 
@@ -12,23 +13,21 @@ async function signup(event) {
     const password = passwordInput.value.trim();
 
     try {
-        const res = await fetch("http://localhost:3000/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password })
+        await axios.post("http://localhost:3000/signup", {
+            name,
+            email,
+            password
         });
 
-        const data = await res.json();
+        window.location.href = "../login.html";
 
-        if (res.ok) {
-            window.location.href = "../login.html";
-        } else {
-            alert(data.error || "Signup failed!");
-        }
-    } 
-    catch (err) {
+    } catch (err) {
         console.error("Error:", err);
-        alert("Something went wrong!");
+        if (err.response) {
+            alert(err.response.data.error || "Signup failed!");
+        } else {
+            alert("Something went wrong!");
+        }
     }
 
     // clear inputs
