@@ -148,7 +148,7 @@ async function display() {
 
 display();
 
-// ----------------- PREMIUM USER CHECK AND FEATURES -------------------
+// PREMIUM USER CHECK AND FEATURES
 async function premiumFeatures() {
     const token = localStorage.getItem("token");
 
@@ -167,40 +167,26 @@ async function premiumFeatures() {
         premiumHeader.innerHTML = `<p>You are a premium user now</p>`;
 
         const leaderBtn = document.querySelector("#leaderBtn");
+        // Clear any previous content in the container
+        leaderBtn.innerHTML = ''; 
+
         const leaderBoardBtn = document.createElement("button");
         leaderBoardBtn.textContent = "Show LeaderBoard";
 
-        const leaderBoardHeading = document.createElement("h3");
-        leaderBoardHeading.textContent = "LeaderBoard";
+        leaderBoardBtn.onclick = () => {
+            window.location.href = "leaderboard.html";
+        };
 
         leaderBtn.appendChild(leaderBoardBtn);
 
         generateReport();
-
-        leaderBoardBtn.onclick = async () => {
-            leaderBtn.appendChild(leaderBoardHeading);
-            try {
-                const res = await axios.get("http://localhost:3000/premium/leaderboard");
-                const data = res.data;
-                const ul = document.getElementById("leaderboard");
-                ul.innerHTML = "";
-
-                data.forEach(user => {
-                    const li = document.createElement("li");
-                    li.textContent = `${user.name} || ₹${user.totalExpense}`;
-                    ul.appendChild(li);
-                });
-            } catch (err) {
-                console.error("Error:", err);
-                alert("Unable to fetch Leaderboard");
-            }
-        };
+        
     } catch (error) {
         console.error("Network error — unable to fetch premium status", error);
     }
 }
 
-// ----------------- REPORT GENERATION -------------------
+// REPORT GENERATION
 async function generateReport() {
     const reportContainer = document.createElement("div");
     const salaryInput = document.createElement("input");
@@ -226,7 +212,7 @@ async function generateReport() {
     document.getElementById("reportDiv").appendChild(reportContainer);
 }
 
-// ----------------- BUY PREMIUM BUTTON -------------------
+// BUY PREMIUM BUTTON
 
 document.getElementById("renderBtn").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
@@ -277,7 +263,7 @@ document.getElementById("renderBtn").addEventListener("click", async () => {
                     }
                 );
                 
-                alert("Transaction Failed ❌");
+                alert("Transaction Failed ");
             }
         });
 
