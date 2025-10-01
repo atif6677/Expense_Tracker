@@ -213,62 +213,27 @@ async function generateReport() {
 }
 
 // BUY PREMIUM BUTTON
+// BUY PREMIUM BUTTON
+
 
 document.getElementById("renderBtn").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
 
     try {
-        // 1️⃣ Create order on backend
-        const res = await axios.get('http://localhost:3000/payment/premium', {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+        // 1️⃣ Create order on backend (status: PENDING)
+        const res = await axios.get("http://localhost:3000/payment/premium", {
+            headers: { "Authorization": `Bearer ${token}` }
         });
 
-        const data = res.data;
+        const { payment_session_id } = res.data;
+        if (!payment_session_id) throw new Error("Failed to create payment session");
 
-        // ✅ Get payment_session_id and orderId from backend
-        const { payment_session_id, order } = data;
-        if (!payment_session_id || !order?.orderId) {
-            throw new Error("Invalid order data from server");
-        }
-
-        const orderId = order.orderId;
-
-        // 2️⃣ Initialize Cashfree Drop-in
+        // 2️⃣ Initialize Cashfree Drop-in and let it redirect automatically
         const cashfree = new Cashfree({ mode: "sandbox" });
+        cashfree.checkout({ paymentSessionId: payment_session_id });
 
-        cashfree.checkout({
-            paymentSessionId: payment_session_id,
-
-            onSuccess: async (result) => {
-                console.log("Payment success data:", result);
-
-                // ✅ Update backend for successful payment
-                await axios.get(`http://localhost:3000/payment/updateTransactionStatus?order_id=${orderId}`);
-                
-                alert("Transaction Successful ✅");
-            },
-
-            onFailure: async (err) => {
-                console.error("Payment failed:", err);
-
-                // ✅ Update backend to mark order as FAILED
-                await axios.post('http://localhost:3000/payment/updateTransactionStatus', 
-                    { order_id: orderId }, 
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    }
-                );
-                
-                alert("Transaction Failed ");
-            }
-        });
-
+        // No need for onSuccess/onFailure handlers here
     } catch (err) {
-        console.error("Error starting payment:", err);
         const message = err.response?.data?.error || err.message;
         alert("Error starting payment: " + message);
     }
