@@ -14,32 +14,33 @@ async function home(event) {
     const amount = Number(amountInput.value);
     const description = descriptionInput.value.trim();
     const category = categoryInput.value;
-
     const token = localStorage.getItem("token");
 
+    if (!amount || !description || !category) {
+        return alert("Please fill all fields");
+    }
+
     try {
-        const res = await axios.post("http://localhost:3000/home", 
-            { amount, description, category }, 
-            { headers: { "Authorization": `Bearer ${token}` } }
+        await axios.post(
+            "http://localhost:3000/home",
+            { amount, description, category },
+            { headers: { Authorization: `Bearer ${token}` } }
         );
 
         alert("Expense added successfully");
         await fetchExpenses();
         renderTable();
-        
+
     } catch (err) {
         console.error("Error:", err);
-        if (err.response) {
-            alert(err.response.data.error || "Failed to add expense.");
-        } else {
-            alert("Something went wrong!");
-        }
+        alert(err.response?.data?.error || "Failed to add expense.");
     }
 
     amountInput.value = "";
     descriptionInput.value = "";
     categoryInput.value = "";
 }
+
 
 async function fetchExpenses() {
     const token = localStorage.getItem("token");
@@ -62,29 +63,22 @@ async function fetchExpenses() {
 
 function renderTable() {
     const parentNode = document.querySelector("#expenseList");
-    parentNode.innerHTML = "";
 
     if (expenses.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "No expenses found";
-        parentNode.appendChild(li);
+        parentNode.innerHTML = "<li>No expenses found</li>";
     } else {
-        expenses.forEach(expense => {
-            const li = document.createElement("li");
-            li.classList.add("expense-item"); // 👈 for counting
-            li.textContent = `${expense.amount} | ${expense.description} | ${expense.category}`;
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "Delete Expense";
-            deleteBtn.onclick = () => deleteExpense(expense.id, li);
-
-            li.appendChild(deleteBtn);
-            parentNode.appendChild(li);
-        });
+        parentNode.innerHTML = expenses.map(expense => `
+            <li class="expense-item">
+                ${expense.amount} | ${expense.description} | ${expense.category}
+                <button onclick="deleteExpense(${expense.id}, this.parentNode)">Delete Expense</button>
+            </li>
+        `).join("");
     }
 
     updatePageInfo();
 }
+
+
 
 function updatePageInfo() {
     document.querySelector("#pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
@@ -95,26 +89,48 @@ async function deleteExpense(id, li) {
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
     try {
+        // 1️⃣ Delete the expense from backend
         await axios.delete(`http://localhost:3000/home/${id}`, {
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
         });
-        
-        li.remove();
 
-        // ✅ Check if current page became empty
-        const remaining = document.querySelectorAll(".expense-item").length;
-        if (remaining === 0 && currentPage > 1) {
-            currentPage--;
+        // 2️⃣ Fetch current page
+        await fetchExpenses();
+
+        // 3️⃣ Fill current page if it has fewer than rowsPerPage and there are more pages
+        while (expenses.length < rowsPerPage && currentPage < totalPages) {
+            currentPage++; // move to next page
+            const res = await axios.get("http://localhost:3000/home", {
+                params: { page: currentPage, limit: rowsPerPage },
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const nextExpenses = res.data.expenses || [];
+            if (nextExpenses.length === 0) break;
+
+            // Take only needed number to fill the current page
+            const needed = rowsPerPage - expenses.length;
+            expenses = expenses.concat(nextExpenses.slice(0, needed));
+
+            // If there are leftover items in next page, keep them for that page
+            // (optional: you can update a local cache of pages if needed)
         }
 
-        await fetchExpenses();
+        // 4️⃣ If current page is empty, go back one page
+        if (expenses.length === 0 && currentPage > 1) {
+            currentPage--;
+            await fetchExpenses();
+        }
+
         renderTable();
 
     } catch (err) {
-        console.error("Error:", err);
+        console.error(err);
         alert("Something went wrong!");
     }
 }
+
+
+
 
 // Pagination controls
 document.getElementById("rowsPerPage").addEventListener("change", async e => {
@@ -140,6 +156,7 @@ document.getElementById("nextBtn").addEventListener("click", async () => {
     }
 });
 
+
 async function display() {
     await fetchExpenses();
     renderTable();
@@ -153,38 +170,45 @@ async function premiumFeatures() {
     const token = localStorage.getItem("token");
 
     try {
-        const result = await axios.get("http://localhost:3000/premium/status", {
+        const { status } = (await axios.get("http://localhost:3000/premium/status", {
             headers: { Authorization: `Bearer ${token}` }
-        });
+        })).data;
 
-        const data = result.data;
-        if (data.status !== "SUCCESSFUL") return;
+        if (status !== "SUCCESSFUL") return;
 
         const buyPremiumBtn = document.querySelector("#renderBtn");
         if (buyPremiumBtn) buyPremiumBtn.style.display = "none";
 
-        const premiumHeader = document.querySelector("#premiumUser");
-        premiumHeader.innerHTML = `<p>You are a premium user now</p>`;
+        document.querySelector("#premiumUser").innerHTML = `<p>You are a premium user now</p>`;
 
         const leaderBtn = document.querySelector("#leaderBtn");
-        // Clear any previous content in the container
-        leaderBtn.innerHTML = ''; 
-
+        leaderBtn.innerHTML = '';
         const leaderBoardBtn = document.createElement("button");
         leaderBoardBtn.textContent = "Show LeaderBoard";
-
-        leaderBoardBtn.onclick = () => {
-            window.location.href = "leaderboard.html";
-        };
-
+        leaderBoardBtn.onclick = () => window.location.href = "leaderboard.html";
         leaderBtn.appendChild(leaderBoardBtn);
 
         generateReport();
-        
-    } catch (error) {
-        console.error("Network error — unable to fetch premium status", error);
+
+    } catch (err) {
+        console.error("Unable to fetch premium status", err);
     }
 }
+
+function generateReport() {
+    const reportDiv = document.getElementById("reportDiv");
+    reportDiv.innerHTML = `
+        <input type="number" placeholder="Enter your monthly salary" id="salaryInput" />
+        <button id="generateReportBtn">Generate Report</button>
+    `;
+    document.getElementById("generateReportBtn").onclick = () => {
+        const salary = document.getElementById("salaryInput").value.trim();
+        if (!salary) return alert("Please enter your salary");
+        localStorage.setItem("userSalary", salary);
+        window.location.href = "report.html";
+    };
+}
+
 
 // REPORT GENERATION
 async function generateReport() {
@@ -212,7 +236,6 @@ async function generateReport() {
     document.getElementById("reportDiv").appendChild(reportContainer);
 }
 
-// BUY PREMIUM BUTTON
 // BUY PREMIUM BUTTON
 
 

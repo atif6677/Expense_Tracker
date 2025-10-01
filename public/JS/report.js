@@ -2,9 +2,36 @@
 
 let currentPage = 1;
 let totalPages = 1;
+let selectedDate = null;   // for daily
+let selectedMonth = null;  // for monthly
+let selectedYear = null;   // for monthly
 
-document.addEventListener("DOMContentLoaded", () => {
-    fetchExpenses(); // Fetch initial report on page load
+document.getElementById("filterSelect").addEventListener("change", (e) => {
+    const filter = e.target.value;
+    const dateContainer = document.getElementById("dateContainer");
+    dateContainer.innerHTML = "";
+
+    if (filter === "daily") {
+        const input = document.createElement("input");
+        input.type = "date";
+        input.id = "dailyDate";
+        input.onchange = () => selectedDate = input.value;
+        dateContainer.appendChild(input);
+    } else if (filter === "monthly") {
+        const monthInput = document.createElement("input");
+        monthInput.type = "month";
+        monthInput.id = "monthDate";
+        monthInput.onchange = () => {
+            const [year, month] = monthInput.value.split("-");
+            selectedYear = year;
+            selectedMonth = month;
+        };
+        dateContainer.appendChild(monthInput);
+    } else {
+        selectedDate = null;
+        selectedMonth = null;
+        selectedYear = null;
+    }
 });
 
 document.getElementById("generateReportBtn").addEventListener("click", () => {
@@ -41,14 +68,17 @@ async function fetchExpenses() {
     const pageIndicator = document.getElementById("pageIndicator");
     pageIndicator.textContent = "Loading...";
 
+    let params = { page: currentPage, limit, filter, salary };
+
+    if (filter === "daily" && selectedDate) params.date = selectedDate;
+    if (filter === "monthly" && selectedMonth && selectedYear) {
+        params.month = selectedMonth;
+        params.year = selectedYear;
+    }
+
     try {
         const res = await axios.get("http://localhost:3000/report/paginated-and-filtered", {
-            params: {
-                page: currentPage,
-                limit: limit,
-                filter: filter,
-                salary: salary,
-            },
+            params,
             headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -71,14 +101,14 @@ function renderTableAndSummary(data) {
     const salary = localStorage.getItem("userSalary") || "0";
     const tbody = document.getElementById("reportTableBody");
     const summaryDiv = document.getElementById("monthlySummary");
-    
-    tbody.innerHTML = ""; 
+
+    tbody.innerHTML = "";
     summaryDiv.innerHTML = "";
 
     if (typeof savings !== 'undefined') {
         summaryDiv.innerHTML = `
             <div style="background-color: #f0f8ff; border: 1px solid #d1e7fd; padding: 10px; border-radius: 5px; margin-top: 10px;">
-                <strong>Monthly Summary:</strong> 
+                <strong>Summary:</strong> 
                 Salary (₹${parseFloat(salary).toFixed(2)}) - 
                 Total Expenses (₹${totalMonthlyExpense.toFixed(2)}) = 
                 <strong>Savings (₹${savings.toFixed(2)})</strong>
@@ -114,16 +144,20 @@ async function downloadCSV() {
     const filter = document.getElementById("filterSelect").value;
     const salary = localStorage.getItem("userSalary") || "0";
 
+    let params = { filter, salary };
+    if (filter === "daily" && selectedDate) params.date = selectedDate;
+    if (filter === "monthly" && selectedMonth && selectedYear) {
+        params.month = selectedMonth;
+        params.year = selectedYear;
+    }
+
     try {
         const res = await axios.get("http://localhost:3000/report/download", {
-            params: {
-                filter: filter,
-                salary: salary,
-            },
+            params,
             headers: { Authorization: `Bearer ${token}` },
-            responseType: 'blob' // Important for file downloads
+            responseType: 'blob'
         });
-        
+
         const blob = res.data;
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");

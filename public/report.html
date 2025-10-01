@@ -20,44 +20,48 @@
   </style>
 </head>
 <body>
+  
+
   <select id="filterSelect">
-    <option value="daily">Daily</option>
-    <option value="weekly">Weekly</option>
-    <option value="monthly">Monthly</option>
-  </select>
+  <option value="">--Select Report Type--</option>
+  <option value="daily">Daily</option>
+  <option value="monthly">Monthly</option>
+</select>
 
-  <button id="generateReportBtn">Generate Report</button>
-  <button id="downloadBtn">Download CSV</button>
+<div id="dateContainer" style="margin-top:10px;"></div>
 
-   <label for="rowsPerPage">Rows per page:</label>
-   <select id="rowsPerPage">
-    <option value="10">10</option>
-    <option value="20">20</option>
-    <option value="40">40</option>
-  </select>
+<button id="generateReportBtn">Generate Report</button>
+<button id="downloadBtn">Download CSV</button>
 
-  <!-- Monthly Summary -->
-  <div id="monthlySummary"></div>
+<label for="rowsPerPage">Rows per page:</label>
+<select id="rowsPerPage">
+  <option value="10">10</option>
+  <option value="20">20</option>
+  <option value="40">40</option>
+</select>
 
+<!-- Monthly Summary -->
+<div id="monthlySummary"></div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Amount</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody id="reportTableBody"></tbody>
-  </table>
+<table>
+  <thead>
+    <tr>
+      <th>Amount</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody id="reportTableBody"></tbody>
+</table>
 
-  <!-- Pagination controls -->
-  <div>
-    <button id="prevPageBtn">Prev</button>
-    <span id="pageIndicator"></span>
-    <button id="nextPageBtn">Next</button>
-  </div>
+<!-- Pagination controls -->
+<div>
+  <button id="prevPageBtn">Prev</button>
+  <span id="pageIndicator"></span>
+  <button id="nextPageBtn">Next</button>
+</div>
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
