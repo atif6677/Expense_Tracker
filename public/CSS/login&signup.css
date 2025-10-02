@@ -1,0 +1,136 @@
+/* ================================
+   General Reset and Font
+================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f6fa;
+}
+
+/* ================================
+   Form Container
+================================= */
+form {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* ================================
+   Form Elements
+================================= */
+form label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+form input {
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border 0.2s;
+}
+
+form input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+/* ================================
+   Buttons
+================================= */
+form button {
+    padding: 0.7rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #007BFF;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+/* Forgot Password Button as Link */
+#forgotPasswordBtn {
+    background: none;
+    color: #007BFF;
+    padding: 0;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+#forgotPasswordBtn:hover {
+    color: #0056b3;
+}
+
+/* ================================
+   Footer Links (Signup/Login)
+================================= */
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-footer a {
+    color: #007BFF;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.form-footer a:hover {
+    color: #0056b3;
+}
+
+/* ================================
+   Forgot Password Form
+================================= */
+#forgotForm {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#forgotForm input {
+    width: 100%;
+}
+
+#forgotForm button {
+    width: 100%;
+}
+
+/* ================================
+   Responsive
+================================= */
+@media (max-width: 500px) {
+    form {
+        padding: 1.5rem;
+    }
+}

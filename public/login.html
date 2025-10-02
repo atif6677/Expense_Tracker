@@ -4,25 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="stylesheet" href="CSS/login&signup.css">
 </head>
 <body>
+<form onsubmit="login(event)">
+    <label for="email">Email:</label>
+    <input type="text" id="email" name="email" required>
 
-    <form onsubmit="login(event)">
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+    <button type="submit">Login</button>
 
-        <button type="submit">Login</button>
-    </form>
+    <div class="form-footer">
+        <a href="signup.html">Don't have an account? Signup</a>
+        <button id="forgotPasswordBtn" type="button">Forgot Password?</button>
+    </div>
+</form>
 
-    <!-- Signup option -->
-    <a href="signup.html">Don't have account-- Signup</a>
-
-    <button id="forgotPasswordBtn" type="button">Forgot Password?</button>
-
-    
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
