@@ -1,0 +1,55 @@
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.8rem;
+  font-size: 0.9rem; /* slightly smaller text */
+}
+
+th, td {
+  border: 1px solid #000;
+  padding: 6px; /* smaller padding */
+  text-align: left;
+}
+
+th {
+  background: #f2f2f2;
+}
+
+/* Buttons */
+button {
+  padding: 0.45rem 0.9rem; /* smaller button size */
+  margin: 0.3rem 0.2rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #007BFF;
+  color: white;
+  font-size: 0.85rem; /* smaller font */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Inputs and selects */
+input, select {
+  padding: 0.4rem 0.8rem; /* smaller padding */
+  margin: 0.2rem 0.2rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.85rem; /* smaller font */
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #007BFF;
+  outline: none;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+}

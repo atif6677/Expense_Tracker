@@ -1,0 +1,32 @@
+/* Leaderboard styles */
+.leaderboard-container {
+  max-width: 500px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.leaderboard-container h2 {
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.leaderboard-list li {
+  background: #f9f9f9;
+  margin: 8px 0;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #444;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
