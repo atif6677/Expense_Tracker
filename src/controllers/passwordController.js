@@ -32,6 +32,9 @@ const forgotPassword = async (req, res) => {
 
         const resetURL = `http://localhost:3000/password/resetpassword/${id}`;
 
+        // ✅ For testing - log URL to console
+        console.log("Password reset URL:", resetURL);
+
         // ✅ Send email using Brevo
         const sendSmtpEmail = new brevo.SendSmtpEmail();
         sendSmtpEmail.subject = "Password Reset Link";
@@ -44,7 +47,6 @@ const forgotPassword = async (req, res) => {
         res.json({ message: 'Password reset link has been sent to your email' });
     } catch (error) {
         console.error(error);
-        // Standardized the response to use 'error' key
         res.status(500).json({ error: 'Server error occurred while sending reset link.' });
     }
 };

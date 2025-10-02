@@ -32,6 +32,9 @@ async function login(event) {
 
 //forgot password
 document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
+  // ✅ prevent duplicate forms
+  if (document.getElementById('forgotForm')) return;
+
   const forgotForm = document.createElement('form');
   forgotForm.id = 'forgotForm';
   forgotForm.innerHTML = `
@@ -46,15 +49,14 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
 
     try {
       const res = await axios.post('http://localhost:3000/password/forgotpassword', { email });
-      
-      alert(res.data.message || 'Reset link sent to your email!');
 
+      alert(res.data.message || 'Reset link sent to your email!');
     } catch (err) {
       console.error("Forgot password error:", err);
       if (err.response) {
-          alert(err.response.data.error || 'Something went wrong');
+        alert(err.response.data.error || 'Something went wrong');
       } else {
-          alert('Something went wrong');
+        alert('Something went wrong');
       }
     }
   });
