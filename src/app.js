@@ -6,7 +6,6 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const db = require("./utils/database");
-
 const app = express();
 
 
@@ -39,11 +38,11 @@ app.use("/report", reportRoutes);
 // Sync DB and start server
 db.sync()
   .then(() => {
-    console.log("✅ Database synced");
+    console.log("Database synced");
     app.listen(3000, () =>
-      console.log("🚀 Server running at http://localhost:3000")
+      console.log(" Server running at http://localhost:3000")
     );
   })
-  .catch((err) => console.error("❌ DB sync error:", err));
+  .catch((err) => console.error("DB sync error:", err));
 
 module.exports = app;

@@ -5,7 +5,6 @@ const ForgotPasswordRequest = require('../models/forgotPasswordModel');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const brevo = require('@getbrevo/brevo');
-require('dotenv').config();
 
 // Configure Brevo client
 const apiInstance = new brevo.TransactionalEmailsApi();
