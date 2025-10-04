@@ -1,8 +1,9 @@
 /* Premium User Thin Line */
 /* Reset body margin/padding */
 body {
-  margin: 0;
-  padding: 0;
+  margin: 0px;
+  padding: 10px;
+  padding-top: 0px;
 }
 
 /* Full-width Header */

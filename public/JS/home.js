@@ -36,9 +36,9 @@ async function home(event) {
         alert(err.response?.data?.error || "Failed to add expense.");
     }
 
-    amountInput.value = "";
-    descriptionInput.value = "";
-    categoryInput.value = "";
+    // amountInput.value = "";
+    // descriptionInput.value = "";
+    // categoryInput.value = "";
 }
 
 

@@ -71,44 +71,59 @@ const getReportExpenses = async (req, res) => {
 const downloadExpenses = async (req, res) => {
     try {
         const { filter, date, month, year, salary } = req.query;
-
         const dateCondition = getDateCondition(filter, date, month, year);
         const whereClause = { userId: req.user.userId, ...dateCondition };
 
-        const expenses = await Expense.findAll({ where: whereClause, raw: true });
+        const expenses = await Expense.findAll({
+            where: whereClause,
+            attributes: ["amount", "description", "createdAt", "category"], // ✅ Only these fields
+            raw: true
+        });
 
         if (!expenses || expenses.length === 0) {
             return res.status(404).json({ error: "No expenses found for the selected period." });
         }
 
-        let csvData = expenses;
+        // Format data
+        const csvData = expenses.map(exp => ({
+            Amount: exp.amount,
+            Description: exp.description,
+            Date: new Date(exp.createdAt).toISOString().split("T")[0],
+            Category: exp.category
+        }));
 
-        // Only add one summary row for monthly report
-        if (filter === 'monthly' && salary && !isNaN(salary)) {
+        // Optional: add summary row for monthly report
+        if (filter === "monthly" && salary && !isNaN(salary)) {
             const totalMonthlyExpense = expenses.reduce((sum, exp) => sum + exp.amount, 0);
             const savings = parseFloat(salary) - totalMonthlyExpense;
 
-            // Add one extra row for summary
             csvData.push({
-                amount: '',
-                description: '--- Summary ---',
-                category: '',
-                createdAt: '',
-                salary: parseFloat(salary),
-                totalMonthlyExpense: totalMonthlyExpense,
-                savings: savings
+                Amount: "",
+                Description: "--- Summary ---",
+                Date: "",
+                Category: "",
+            });
+            csvData.push({
+                Amount: `Total: ${totalMonthlyExpense}`,
+                Description: `Salary: ${salary}`,
+                Date: "",
+                Category: `Savings: ${savings}`,
             });
         }
 
-        const json2csvParser = new Parser();
+        const fields = ["Amount", "Description", "Date", "Category"];
+        const json2csvParser = new Parser({ fields });
         const csv = json2csvParser.parse(csvData);
 
-        res.header('Content-Type', 'text/csv');
-        res.attachment('expense_report.csv');
+        res.header("Content-Type", "text/csv");
+        res.attachment("expense_report.csv");
         return res.send(csv);
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("Error generating CSV:", err);
+        res.status(500).json({ error: "Failed to generate CSV" });
     }
 };
+
+
 module.exports = { getReportExpenses, downloadExpenses };
