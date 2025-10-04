@@ -61,30 +61,42 @@ async function fetchExpenses() {
     }
 }
 
-function renderTable() {
-    const parentNode = document.querySelector("#expenseList");
 
-    if (expenses.length === 0) {
-        parentNode.innerHTML = "<li>No expenses found</li>";
-    } else {
-        parentNode.innerHTML = expenses.map(expense => `
-            <li class="expense-item">
-                ${expense.amount} | ${expense.description} | ${expense.category}
-                <button onclick="deleteExpense(${expense.id}, this.parentNode)">Delete Expense</button>
-            </li>
-        `).join("");
+function renderTable() {
+    const tbody = document.getElementById("expenseList");
+    tbody.innerHTML = ""; // Clear previous entries
+
+    if (!expenses || expenses.length === 0) {
+        // Display a message within a proper table row
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No expenses found.</td></tr>';
+        updatePageInfo();
+        return;
     }
+
+    // Create a table row for each expense
+    expenses.forEach(expense => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${expense.amount}</td>
+            <td>${expense.description}</td>
+            <td>${expense.category}</td>
+            <td>
+                <button onclick="deleteExpense(${expense.id})">Delete Expense</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
 
     updatePageInfo();
 }
-
 
 
 function updatePageInfo() {
     document.querySelector("#pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
 }
 
-async function deleteExpense(id, li) {
+// Updated deleteExpense to remove the unused 'li' parameter
+async function deleteExpense(id) { 
     const token = localStorage.getItem("token");
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
@@ -110,9 +122,6 @@ async function deleteExpense(id, li) {
             // Take only needed number to fill the current page
             const needed = rowsPerPage - expenses.length;
             expenses = expenses.concat(nextExpenses.slice(0, needed));
-
-            // If there are leftover items in next page, keep them for that page
-            // (optional: you can update a local cache of pages if needed)
         }
 
         // 4️⃣ If current page is empty, go back one page
@@ -128,6 +137,7 @@ async function deleteExpense(id, li) {
         alert("Something went wrong!");
     }
 }
+
 
 
 
@@ -195,6 +205,10 @@ async function premiumFeatures() {
     }
 }
 
+
+
+
+// REPORT GENERATION
 function generateReport() {
     const reportDiv = document.getElementById("reportDiv");
     reportDiv.innerHTML = `
@@ -207,33 +221,6 @@ function generateReport() {
         localStorage.setItem("userSalary", salary);
         window.location.href = "report.html";
     };
-}
-
-
-// REPORT GENERATION
-async function generateReport() {
-    const reportContainer = document.createElement("div");
-    const salaryInput = document.createElement("input");
-    salaryInput.type = "number";
-    salaryInput.placeholder = "Enter your monthly salary";
-    salaryInput.id = "salaryInput";
-
-    const reportBtn = document.createElement("button");
-    reportBtn.textContent = "Generate Report";
-
-    reportBtn.onclick = () => {
-        const salary = salaryInput.value.trim();
-        if (!salary) {
-            alert("Please enter your salary first.");
-            return;
-        }
-        localStorage.setItem("userSalary", salary);
-        window.location.href = "report.html";
-    };
-
-    reportContainer.appendChild(salaryInput);
-    reportContainer.appendChild(reportBtn);
-    document.getElementById("reportDiv").appendChild(reportContainer);
 }
 
 // BUY PREMIUM BUTTON

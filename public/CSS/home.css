@@ -1,0 +1,122 @@
+/* Premium User Thin Line */
+/* Reset body margin/padding */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Full-width Header */
+.main-header {
+  background-color: #2b5a8b;
+  color: white;
+  padding: 12px 20px;
+  margin: 0;                   /* remove margin */
+  width: 100%;                 /* full width */
+  box-sizing: border-box;       /* include padding in width */
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+}
+
+/* Premium User inside header */
+#premiumUser {
+  font-size: 0.85rem;
+  color: #fff;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+}
+
+th, td {
+  border: 1px solid #000;
+  padding: 6px;
+  text-align: left;
+}
+
+th {
+  background: #f2f2f2;
+}
+
+/* Buttons */
+button {
+  padding: 0.45rem 0.9rem;
+  margin: 0.3rem 0.2rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #0d81fd;
+  color: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+label {
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+/* Inputs and selects */
+input, select {
+  padding: 0.4rem 0.8rem;
+  margin: 0.2rem 0.2rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #007BFF;
+  outline: none;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+}
+
+#leaderBtn, #reportDiv {
+  display: inline-block; /* default is block, so side-by-side won't happen */
+  margin: 0 5px; /* optional spacing */
+}
+
+
+#expenseListHeader {
+  background-color: #2b5a8b; /* sub-header color */
+  color: white;
+  padding: 8px 16px;
+  margin-right: 1200px;
+  display: inline-block;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+
+     /* higher than other elements */
+}
+
+.actionsWidth {
+  width: 300px; /* Adjust as needed */
+}

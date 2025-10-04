@@ -3,23 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Expense Tracker - Home</title>
+  <link rel="stylesheet" href="./CSS/home.css">
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
-
 </head>
 <body>
 
-  <div id="premiumUser"></div>
+ 
 
+  <header class="main-header">
+    <h3>Expense Tracker</h3>
+    <div id="premiumUser"></div>
+    <div class="row">
+      <button id="renderBtn">Buy Premium</button>
+  </div>
+  </header>
+  
+  <div id="leaderBtn"></div>
+  <div id="reportDiv"></div>
+
+
+  
+
+  <!-- Add Expense Form -->
   <form onsubmit="home(event)">
-      <label for="amount">Expense Amount: </label>
-      <input type="number" name="amount" id="amount">
+      <label for="amount">Expense Amount:</label>
+      <input type="number" id="amount" name="amount">
 
-      <label for="description">Description</label>
-      <input type="text" name="description" id="description">
+      <label for="description">Description:</label>
+      <input type="text" id="description" name="description">
 
-      <label for="category">Category</label>
-      <select name="category" id="category">
+      <label for="category">Category:</label>
+      <select id="category" name="category">
           <option value="food">Food</option>
           <option value="fuel">Fuel</option>
           <option value="entertainment">Entertainment</option>
@@ -30,22 +45,32 @@
       <button type="submit">Add Expense</button>
   </form>
 
-  <div class="row">
-      <button id="renderBtn">Buy Premium</button>
-  </div>
+  
 
+  <!-- Expense List -->
   <div>
-      <h3>Expense List</h3>
+      <h3 id="expenseListHeader">Expense List</h3>
 
-      <label for="rowsPerPage">Rows per page: </label>
+      <label for="rowsPerPage">Rows per page:</label>
       <select id="rowsPerPage">
           <option value="10" selected>10</option>
           <option value="20">20</option>
           <option value="40">40</option>
       </select>
 
-      <ul id="expenseList"></ul>
+      <table>
+        <thead>
+          <tr>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th class="actionsWidth">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="expenseList"></tbody>
+      </table>
 
+      <!-- Pagination -->
       <div>
           <button id="prevBtn">Prev</button>
           <span id="pageInfo"></span>
@@ -53,11 +78,8 @@
       </div>
   </div>
 
-  <div id="leaderBtn"></div>
-  <ul id="leaderboard"></ul>
-
-  <div id="reportDiv"></div>
-
+  
+  
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="./JS/home.js"></script>
