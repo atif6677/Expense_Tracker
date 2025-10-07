@@ -1,22 +1,40 @@
-//public/JS/report.js
-
 let currentPage = 1;
 let totalPages = 1;
 let selectedDate = null;   // for daily
 let selectedMonth = null;  // for monthly
 let selectedYear = null;   // for monthly
 
+const generateBtn = document.getElementById("generateReportBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+
+// 🔒 Disable both buttons initially
+generateBtn.disabled = true;
+downloadBtn.disabled = true;
+
 document.getElementById("filterSelect").addEventListener("change", (e) => {
     const filter = e.target.value;
     const dateContainer = document.getElementById("dateContainer");
     dateContainer.innerHTML = "";
 
+    // Reset selections
+    selectedDate = null;
+    selectedMonth = null;
+    selectedYear = null;
+    generateBtn.disabled = true;
+    downloadBtn.disabled = true;
+
     if (filter === "daily") {
         const input = document.createElement("input");
         input.type = "date";
         input.id = "dailyDate";
-        input.onchange = () => selectedDate = input.value;
+        input.onchange = () => {
+            selectedDate = input.value;
+            const enable = !!selectedDate;
+            generateBtn.disabled = !enable;
+            downloadBtn.disabled = !enable;
+        };
         dateContainer.appendChild(input);
+
     } else if (filter === "monthly") {
         const monthInput = document.createElement("input");
         monthInput.type = "month";
@@ -25,21 +43,22 @@ document.getElementById("filterSelect").addEventListener("change", (e) => {
             const [year, month] = monthInput.value.split("-");
             selectedYear = year;
             selectedMonth = month;
+            const enable = selectedMonth && selectedYear;
+            generateBtn.disabled = !enable;
+            downloadBtn.disabled = !enable;
         };
         dateContainer.appendChild(monthInput);
-    } else {
-        selectedDate = null;
-        selectedMonth = null;
-        selectedYear = null;
     }
+    // For "all" or invalid option → both stay disabled
 });
 
-document.getElementById("generateReportBtn").addEventListener("click", () => {
+generateBtn.addEventListener("click", () => {
+    // Button only works when enabled
     currentPage = 1;
     fetchExpenses();
 });
 
-document.getElementById("downloadBtn").addEventListener("click", downloadCSV);
+downloadBtn.addEventListener("click", downloadCSV);
 
 document.getElementById("prevPageBtn").addEventListener("click", () => {
     if (currentPage > 1) {
@@ -92,7 +111,8 @@ async function fetchExpenses() {
         const message = err.response?.data?.error || "Unable to fetch report data.";
         alert(message);
         pageIndicator.textContent = "Error";
-        document.getElementById("reportTableBody").innerHTML = '<tr><td colspan="4">Error loading data.</td></tr>';
+        document.getElementById("reportTableBody").innerHTML =
+            '<tr><td colspan="4">Error loading data.</td></tr>';
     }
 }
 
@@ -135,8 +155,8 @@ function renderTableAndSummary(data) {
 
 function updatePageIndicator(totalPages) {
     document.getElementById("pageIndicator").textContent = `Page ${currentPage} of ${totalPages}`;
-    document.getElementById("prevPageBtn").disabled = (currentPage <= 1);
-    document.getElementById("nextPageBtn").disabled = (currentPage >= totalPages);
+    document.getElementById("prevPageBtn").disabled = currentPage <= 1;
+    document.getElementById("nextPageBtn").disabled = currentPage >= totalPages;
 }
 
 async function downloadCSV() {
@@ -155,7 +175,7 @@ async function downloadCSV() {
         const res = await axios.get("http://localhost:3000/report/download", {
             params,
             headers: { Authorization: `Bearer ${token}` },
-            responseType: 'blob'
+            responseType: "blob"
         });
 
         const blob = res.data;
