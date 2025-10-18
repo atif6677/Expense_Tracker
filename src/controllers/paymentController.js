@@ -9,7 +9,7 @@ const createPremiumOrder = async (req, res) => {
         if (!user) return res.status(404).json({ error: "User not found" });
 
         const orderId = `order_${Date.now()}`;
-        const orderAmount = 2500.00;
+        const orderAmount = 500.00;
 
         const paymentSessionId = await cashfreeService.createOrder(
             orderId,

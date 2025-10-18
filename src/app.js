@@ -36,11 +36,13 @@ app.use("/password",passwordRoutes);
 app.use("/report", reportRoutes);
 
 // Sync DB and start server
+const PORT = process.env.PORT || 3000;
+
 db.sync()
   .then(() => {
     console.log("Database synced");
-    app.listen(3000, () =>
-      console.log(" Server running at http://localhost:3000")
+    app.listen(PORT, () =>
+      console.log(`✅ Server running on port ${PORT}`)
     );
   })
   .catch((err) => console.error("DB sync error:", err));

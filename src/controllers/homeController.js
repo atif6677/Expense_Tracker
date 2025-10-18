@@ -2,7 +2,8 @@
 
 const Expense = require('../models/homeModel');
 const User = require('../models/signupModel'); // 👈 Import User model
-const db = require('../utils/database'); // 👈 Import Sequelize instance for transactions
+const db = require('../utils/database');
+const { uploadToS3 } = require('../services/s3Services'); 
 
 const addExpense = async (req, res) => {
     // Start a transaction
@@ -113,4 +114,29 @@ const deleteExpense = async (req, res) => {
     }
 };
 
-module.exports = { addExpense, getExpense, deleteExpense };
+
+
+const downloadExpenses = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const expenses = await Expense.findAll({ where: { userId } });
+
+    const stringifiedExpenses = JSON.stringify(expenses);
+    const filename = `Expense${userId}.txt`;
+
+    const fileURL = await uploadToS3(stringifiedExpenses, filename); // ✅ Use imported service
+
+    return res.status(200).json({ link: fileURL, success: true });
+  } catch (err) {
+    console.error('Error in downloadExpenses:', err);
+    return res.status(500).json({ error: 'Something went wrong' });
+  }
+};
+
+
+
+
+
+
+
+module.exports = { addExpense, getExpense, deleteExpense ,downloadExpenses};

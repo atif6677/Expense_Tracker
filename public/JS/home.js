@@ -1,5 +1,4 @@
 let expenses = [];
-
 let currentPage = 1;
 let rowsPerPage = 10;
 let totalPages = 1;
@@ -28,31 +27,25 @@ async function home(event) {
         );
 
         alert("Expense added successfully");
-        await fetchExpenses();
-        renderTable();
-
+        await fetchExpenses(); // keep separate
     } catch (err) {
         console.error("Error:", err);
         alert(err.response?.data?.error || "Failed to add expense.");
     }
-
-    // amountInput.value = "";
-    // descriptionInput.value = "";
-    // categoryInput.value = "";
 }
-
 
 async function fetchExpenses() {
     const token = localStorage.getItem("token");
     try {
         const res = await axios.get("http://localhost:3000/home", {
             params: { page: currentPage, limit: rowsPerPage },
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
         });
         
         expenses = res.data.expenses || [];
         totalPages = res.data.totalPages || 1;
-        
+
+        renderTable(); // render separately
     } catch (err) {
         console.error("Unable to fetch data", err);
         if (err.response) {
@@ -61,28 +54,24 @@ async function fetchExpenses() {
     }
 }
 
-
 function renderTable() {
     const tbody = document.getElementById("expenseList");
     tbody.innerHTML = ""; // Clear previous entries
 
     if (!expenses || expenses.length === 0) {
-        // Display a message within a proper table row
         tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No expenses found.</td></tr>';
         updatePageInfo();
         return;
     }
 
-    // Create a table row for each expense
     expenses.forEach(expense => {
         const row = document.createElement("tr");
+        row.dataset.id = expense.id; // for event delegation
         row.innerHTML = `
             <td>${expense.amount}</td>
             <td>${expense.description}</td>
             <td>${expense.category}</td>
-            <td>
-                <button onclick="deleteExpense(${expense.id})">Delete Expense</button>
-            </td>
+            <td><button class="delete-btn">Delete Expense</button></td>
         `;
         tbody.appendChild(row);
     });
@@ -90,71 +79,54 @@ function renderTable() {
     updatePageInfo();
 }
 
-
 function updatePageInfo() {
     document.querySelector("#pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
 }
 
-// Updated deleteExpense to remove the unused 'li' parameter
+/* ✅ Simplified deleteExpense logic */
 async function deleteExpense(id) { 
     const token = localStorage.getItem("token");
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
     try {
-        // 1️⃣ Delete the expense from backend
         await axios.delete(`http://localhost:3000/home/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
-        // 2️⃣ Fetch current page
+        // Re-fetch to update table
         await fetchExpenses();
 
-        // 3️⃣ Fill current page if it has fewer than rowsPerPage and there are more pages
-        while (expenses.length < rowsPerPage && currentPage < totalPages) {
-            currentPage++; // move to next page
-            const res = await axios.get("http://localhost:3000/home", {
-                params: { page: currentPage, limit: rowsPerPage },
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const nextExpenses = res.data.expenses || [];
-            if (nextExpenses.length === 0) break;
-
-            // Take only needed number to fill the current page
-            const needed = rowsPerPage - expenses.length;
-            expenses = expenses.concat(nextExpenses.slice(0, needed));
-        }
-
-        // 4️⃣ If current page is empty, go back one page
+        // If page is empty after deletion → go back one page
         if (expenses.length === 0 && currentPage > 1) {
             currentPage--;
             await fetchExpenses();
         }
-
-        renderTable();
-
     } catch (err) {
         console.error(err);
         alert("Something went wrong!");
     }
 }
 
+/* ✅ Use Event Delegation for Delete Buttons */
+document.getElementById("expenseList").addEventListener("click", async e => {
+    if (e.target.classList.contains("delete-btn")) {
+        const row = e.target.closest("tr");
+        const id = row?.dataset.id;
+        if (id) await deleteExpense(id);
+    }
+});
 
-
-
-
-// Pagination controls
+/* Pagination controls */
 document.getElementById("rowsPerPage").addEventListener("change", async e => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
     await fetchExpenses();
-    renderTable();
 });
 
 document.getElementById("prevBtn").addEventListener("click", async () => {
     if (currentPage > 1) {
         currentPage--;
         await fetchExpenses();
-        renderTable();
     }
 });
 
@@ -162,20 +134,17 @@ document.getElementById("nextBtn").addEventListener("click", async () => {
     if (currentPage < totalPages) {
         currentPage++;
         await fetchExpenses();
-        renderTable();
     }
 });
 
-
 async function display() {
     await fetchExpenses();
-    renderTable();
     premiumFeatures();
 }
 
 display();
 
-// PREMIUM USER CHECK AND FEATURES
+/* PREMIUM USER CHECK AND FEATURES */
 async function premiumFeatures() {
     const token = localStorage.getItem("token");
 
@@ -199,16 +168,12 @@ async function premiumFeatures() {
         leaderBtn.appendChild(leaderBoardBtn);
 
         generateReport();
-
     } catch (err) {
         console.error("Unable to fetch premium status", err);
     }
 }
 
-
-
-
-// REPORT GENERATION
+/* REPORT GENERATION */
 function generateReport() {
     const reportDiv = document.getElementById("reportDiv");
     reportDiv.innerHTML = `
@@ -223,14 +188,11 @@ function generateReport() {
     };
 }
 
-// BUY PREMIUM BUTTON
-
-
+/* BUY PREMIUM BUTTON */
 document.getElementById("renderBtn").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
 
     try {
-        // 1️⃣ Create order on backend (status: PENDING)
         const res = await axios.get("http://localhost:3000/payment/premium", {
             headers: { "Authorization": `Bearer ${token}` }
         });
@@ -238,13 +200,27 @@ document.getElementById("renderBtn").addEventListener("click", async () => {
         const { payment_session_id } = res.data;
         if (!payment_session_id) throw new Error("Failed to create payment session");
 
-        // 2️⃣ Initialize Cashfree Drop-in and let it redirect automatically
         const cashfree = new Cashfree({ mode: "sandbox" });
         cashfree.checkout({ paymentSessionId: payment_session_id });
-
-        // No need for onSuccess/onFailure handlers here
     } catch (err) {
         const message = err.response?.data?.error || err.message;
         alert("Error starting payment: " + message);
+    }
+});
+
+/* DOWNLOAD EXPENSES */
+document.getElementById("downloadExpences").addEventListener("click", async () => {
+    const token = localStorage.getItem("token");
+    try {
+        const linkexpenses = await axios.get("http://localhost:3000/home/download", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (linkexpenses.status === 200) {
+            window.location.href = linkexpenses.data.link;
+        }
+
+    } catch (error) {
+        console.error(error);
     }
 });
