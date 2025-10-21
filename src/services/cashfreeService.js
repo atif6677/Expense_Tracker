@@ -2,6 +2,9 @@
 
 const axios = require("axios");
 
+const SERVER_URL = process.env.SERVER_URL;
+
+
 const createOrder = async (orderId, orderAmount, customerId, customerPhone, customerEmail) => {
   try {
     const response = await axios.post(
@@ -16,7 +19,7 @@ const createOrder = async (orderId, orderAmount, customerId, customerPhone, cust
           customer_phone: customerPhone,
         },
         order_meta: {
-          return_url: `/payment/updateTransactionStatus?order_id=${encodeURIComponent(orderId)}`,
+          return_url: `${SERVER_URL}/payment/updateTransactionStatus?order_id=${encodeURIComponent(orderId)}`,
         },
       },
       {
