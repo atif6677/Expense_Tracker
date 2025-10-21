@@ -21,7 +21,7 @@ async function home(event) {
 
     try {
         await axios.post(
-            "http://localhost:3000/home",
+            "/home",
             { amount, description, category },
             { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -37,7 +37,7 @@ async function home(event) {
 async function fetchExpenses() {
     const token = localStorage.getItem("token");
     try {
-        const res = await axios.get("http://localhost:3000/home", {
+        const res = await axios.get("/home", {
             params: { page: currentPage, limit: rowsPerPage },
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -89,7 +89,7 @@ async function deleteExpense(id) {
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
     try {
-        await axios.delete(`http://localhost:3000/home/${id}`, {
+        await axios.delete(`/home/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -149,7 +149,7 @@ async function premiumFeatures() {
     const token = localStorage.getItem("token");
 
     try {
-        const { status } = (await axios.get("http://localhost:3000/premium/status", {
+        const { status } = (await axios.get("/premium/status", {
             headers: { Authorization: `Bearer ${token}` }
         })).data;
 
@@ -193,7 +193,7 @@ document.getElementById("renderBtn").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
 
     try {
-        const res = await axios.get("http://localhost:3000/payment/premium", {
+        const res = await axios.get("/payment/premium", {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
@@ -212,7 +212,7 @@ document.getElementById("renderBtn").addEventListener("click", async () => {
 document.getElementById("downloadExpences").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
     try {
-        const linkexpenses = await axios.get("http://localhost:3000/home/download", {
+        const linkexpenses = await axios.get("/home/download", {
             headers: { "Authorization": `Bearer ${token}` }
         });
 

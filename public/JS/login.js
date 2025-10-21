@@ -9,7 +9,7 @@ async function login(event) {
     const password = loginPassword.value.trim();
 
     try {
-        const res = await axios.post('http://localhost:3000/login', { email, password });
+        const res = await axios.post('/login', { email, password });
 
         // On success, axios provides the response data directly in `res.data`
         localStorage.setItem("token", res.data.token);
@@ -49,7 +49,7 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
     const email = document.getElementById('forgotEmail').value.trim();
 
     try {
-      const res = await axios.post('http://localhost:3000/password/forgotpassword', { email });
+      const res = await axios.post('/password/forgotpassword', { email });
 
       alert(res.data.message || 'Reset link sent to your email!');
       

@@ -1,3 +1,4 @@
+// src/controllers/signupController.js
 const User = require("../models/signupModel");
 const bcrypt = require("bcrypt");
 

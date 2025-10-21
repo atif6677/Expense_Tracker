@@ -4,7 +4,7 @@ async function fetchAndRenderLeaderboard() {
     ul.innerHTML = "<li>Fetching data...</li>";
 
     try {
-        const res = await axios.get("http://localhost:3000/premium/leaderboard");
+        const res = await axios.get("/premium/leaderboard");
         const data = res.data;
         
         ul.innerHTML = ""; // Clear the loading message

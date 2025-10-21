@@ -13,7 +13,7 @@ async function signup(event) {
     const password = passwordInput.value.trim();
 
     try {
-        await axios.post("http://localhost:3000/signup", {
+        await axios.post("/signup", {
             name,
             email,
             password

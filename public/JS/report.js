@@ -96,7 +96,7 @@ async function fetchExpenses() {
     }
 
     try {
-        const res = await axios.get("http://localhost:3000/report/paginated-and-filtered", {
+        const res = await axios.get("/report/paginated-and-filtered", {
             params,
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -172,7 +172,7 @@ async function downloadCSV() {
     }
 
     try {
-        const res = await axios.get("http://localhost:3000/report/download", {
+        const res = await axios.get("/report/download", {
             params,
             headers: { Authorization: `Bearer ${token}` },
             responseType: "blob"

@@ -1,4 +1,4 @@
-// signupModel.js
+// src/models/signupModel.js
 
 const db = require("../utils/database");
 const { DataTypes } = require("sequelize");
