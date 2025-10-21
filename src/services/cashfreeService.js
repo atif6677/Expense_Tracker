@@ -16,7 +16,7 @@ const createOrder = async (orderId, orderAmount, customerId, customerPhone, cust
           customer_phone: customerPhone,
         },
         order_meta: {
-          return_url: `http://localhost:3000/payment/updateTransactionStatus?order_id=${encodeURIComponent(orderId)}`,
+          return_url: `/payment/updateTransactionStatus?order_id=${encodeURIComponent(orderId)}`,
         },
       },
       {
