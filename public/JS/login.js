@@ -2,12 +2,11 @@
 async function login(event) {
     event.preventDefault();
     
-    const loginEmail = document.querySelector('#email');
-    const loginPassword = document.querySelector('#password');
-    
-    const email = loginEmail.value.trim();
-    const password = loginPassword.value.trim();
 
+    const email = document.querySelector('#email').value.trim();
+    const password = document.querySelector('#password').value.trim();
+
+ 
     try {
         const res = await axios.post('/login', { email, password });
 
@@ -17,8 +16,6 @@ async function login(event) {
 
     } 
     catch (err) {
-        console.error("Error:", err);
-        // Axios places error responses in err.response
         if (err.response) {
             alert(err.response.data.error || "Login failed!");
         } else {
@@ -26,14 +23,14 @@ async function login(event) {
         }
     }
 
-    loginEmail.value = "";
-    loginPassword.value = "";
+    event.target.reset();
 }
 
 //forgot password
 
 document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
-  // ✅ prevent duplicate forms
+
+  //  prevent duplicate forms
   if (document.getElementById('forgotForm')) return;
 
   const forgotForm = document.createElement('form');
@@ -53,17 +50,16 @@ document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
 
       alert(res.data.message || 'Reset link sent to your email!');
       
-      // ✅ remove the form after alert
+      //  remove the form after alert
       forgotForm.remove();
 
     } catch (err) {
-      console.error("Forgot password error:", err);
       if (err.response) {
         alert(err.response.data.error || 'Something went wrong');
       } else {
         alert('Something went wrong');
       }
-      // ✅ still remove the form on error so user clicks again
+      //  still remove the form on error so user clicks again
       forgotForm.remove();
     }
   });

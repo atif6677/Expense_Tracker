@@ -1,4 +1,5 @@
 // src/controllers/loginController.js
+
 const User = require("../models/signupModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -34,7 +35,9 @@ const loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+       console.error('Login Error:', error);
+        // 500 Internal Server Error for unexpected issues (like DB connection failure)
+        res.status(500).json({ error: 'Failed to complete Login. Please try again later.' });
   }
 };
 

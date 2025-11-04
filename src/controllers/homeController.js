@@ -1,7 +1,7 @@
 // src/controllers/homeController.js
 
 const Expense = require('../models/homeModel');
-const User = require('../models/signupModel'); // 👈 Import User model
+const User = require('../models/signupModel'); 
 const db = require('../utils/database');
 const { uploadToS3 } = require('../services/s3Services'); 
 

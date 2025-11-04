@@ -6,24 +6,25 @@ let totalPages = 1;
 async function home(event) {
     event.preventDefault();
 
-    const amountInput = document.querySelector("#amount");
-    const descriptionInput = document.querySelector("#description");
-    const categoryInput = document.querySelector("#category");
-
-    const amount = Number(amountInput.value);
-    const description = descriptionInput.value.trim();
-    const category = categoryInput.value;
+    const amount = Number(document.querySelector("#amount").value);
+    const description = document.querySelector("#description").value.trim();
+    const category = document.querySelector("#category").value;
+    
     const token = localStorage.getItem("token");
+
 
     if (!amount || !description || !category) {
         return alert("Please fill all fields");
     }
 
+
+    const expenseData = { amount, description, category };
+
+
     try {
-        await axios.post(
-            "/home",
-            { amount, description, category },
-            { headers: { Authorization: `Bearer ${token}` } }
+        await axios.post("/home", expenseData, {
+         headers: { Authorization: `Bearer ${token}` },
+         }
         );
 
         alert("Expense added successfully");
@@ -122,6 +123,7 @@ document.getElementById("rowsPerPage").addEventListener("change", async e => {
     currentPage = 1;
     await fetchExpenses();
 });
+
 
 document.getElementById("prevBtn").addEventListener("click", async () => {
     if (currentPage > 1) {

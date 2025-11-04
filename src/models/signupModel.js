@@ -22,9 +22,9 @@ const User = db.define("User", {
     type: DataTypes.STRING,
     allowNull: false
   },
-  // This is the new column for optimization
+  
   totalExpenses: {
-    type: DataTypes.INTEGER, // Or DataTypes.DECIMAL for more precision with money
+    type: DataTypes.INTEGER,
     defaultValue: 0,
     allowNull: false
   }

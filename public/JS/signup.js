@@ -4,25 +4,23 @@
 async function signup(event) {
     event.preventDefault();
 
-    const nameInput = document.querySelector("#name");
-    const emailInput = document.querySelector("#email");
-    const passwordInput = document.querySelector("#password");
+   const name = document.querySelector("#name").value.trim();
+   const email = document.querySelector("#email").value.trim();
+   const password = document.querySelector("#password").value.trim();
 
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+   const userData = {
+        name,   
+        email,     
+        password   
+    };
 
     try {
-        await axios.post("/signup", {
-            name,
-            email,
-            password
-        });
+
+        await axios.post("/signup", userData);
 
         window.location.href = "../login.html";
 
     } catch (err) {
-        console.error("Error:", err);
         if (err.response) {
             alert(err.response.data.error || "Signup failed!");
         } else {
@@ -31,7 +29,5 @@ async function signup(event) {
     }
 
     // clear inputs
-    nameInput.value = "";
-    emailInput.value = "";
-    passwordInput.value = "";
+    event.target.reset();
 }
