@@ -31,41 +31,152 @@
 /* -------------------------------
    FILTER SECTION
 --------------------------------*/
+/* -------------------------------
+   FILTER SECTION — Perfect Alignment
+--------------------------------*/
 .filters {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
+  align-items: flex-end;
+  gap: 25px;
   margin-bottom: 25px;
 }
 
+/* Input Groups (Label + Field) */
 .input-group {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 6px;
+  min-width: 180px;
 }
 
 .input-group label {
   font-weight: 600;
-  margin-bottom: 4px;
   color: #0a2342;
+  font-size: 14px;
 }
 
-input,
-select {
-  padding: 8px 10px;
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 10px 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 14px;
-  transition: all 0.3s;
+  font-size: 15px;
+  transition: border 0.3s, box-shadow 0.3s;
 }
 
-input:focus,
-select:focus {
+.input-group input:focus,
+.input-group select:focus {
   border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
   outline: none;
 }
+
+/* Date Picker Container */
+#dateContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+#dateContainer input[type="date"],
+#dateContainer input[type="month"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+#dateContainer input[type="date"]:focus,
+#dateContainer input[type="month"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* Buttons + Rows Dropdown aligned in same line */
+.action-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+}
+
+.action-row .btn-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.action-row button {
+  background-color: #0a2342; /* navbar dark blue */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.3s, transform 0.2s;
+  height: 42px;
+}
+
+.action-row button:hover {
+  background-color: #003366;
+  transform: scale(1.05);
+}
+
+/* Rows per page */
+.action-row .rows-per-page {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.action-row .rows-per-page label {
+  font-weight: 600;
+  color: #0a2342;
+  font-size: 14px;
+}
+
+.action-row .rows-per-page select {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  min-width: 100px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .filters {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .input-group,
+  #dateContainer,
+  .action-row {
+    width: 100%;
+    align-items: center;
+  }
+
+  .action-row {
+    flex-direction: column;
+  }
+
+  .action-row button,
+  .action-row select {
+    width: 100%;
+  }
+}
+
+
 
 /* -------------------------------
    BUTTONS

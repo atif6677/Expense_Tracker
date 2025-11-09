@@ -1,4 +1,10 @@
 // Function to fetch and render the leaderboard data
+// 🚫 Block unauthorized users
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "./login.html";
+}
+
 async function fetchAndRenderLeaderboard() {
     const ul = document.getElementById("leaderboardList");
     ul.innerHTML = "<li>Fetching data...</li>";

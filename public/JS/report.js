@@ -1,3 +1,9 @@
+// 🚫 Block unauthorized users
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "./login.html";
+}
+
 let currentPage = 1;
 let totalPages = 1;
 let selectedDate = null;

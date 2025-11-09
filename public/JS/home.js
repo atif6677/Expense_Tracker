@@ -1,3 +1,10 @@
+// 🚫 Block unauthorized users
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "./login.html";
+}
+
+
 let expenses = [];
 let currentPage = 1;
 let rowsPerPage = 10;
