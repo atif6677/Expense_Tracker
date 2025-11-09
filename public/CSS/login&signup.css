@@ -1,139 +1,172 @@
-/* ================================
-   General Reset and Font
-================================= */
+/* =========================================
+   AUTH PAGES (Login / Signup / Forgot Password)
+   Styled to match Home / Leaderboard UI
+========================================= */
+
+/* -------------------------------
+   GLOBAL RESET & BASE
+--------------------------------*/
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f5f6fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f5f7fa;
+  color: #222;
 }
 
-/* ================================
-   Form Container
-================================= */
+/* -------------------------------
+   FORM CONTAINER
+--------------------------------*/
 form {
-    display: flex;
-    flex-direction: column;
-    background-color: #fff;
-    padding: 1.5rem; /* reduced from 2rem */
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 360px; /* reduced from 400px */
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* ================================
-   Form Elements
-================================= */
+form:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* -------------------------------
+   FORM HEADINGS (Optional)
+--------------------------------*/
+form h2 {
+  text-align: center;
+  color: #0a2342;
+  margin-bottom: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* -------------------------------
+   FORM ELEMENTS
+--------------------------------*/
 form label {
-    margin-bottom: 0.4rem; /* reduced from 0.5rem */
-    font-weight: 500;
-    color: #333;
-    font-size: 0.9rem; /* slightly smaller */
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: #0a2342;
+  font-size: 0.9rem;
 }
 
 form input {
-    padding: 0.45rem 0.8rem; /* reduced from 0.6rem 1rem */
-    margin-bottom: 0.8rem; /* reduced from 1rem */
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 0.9rem; /* slightly smaller */
-    transition: border 0.2s;
+  padding: 0.55rem 0.9rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 form input:focus {
-    border-color: #007BFF;
-    outline: none;
+  border-color: #0a2342;
+  box-shadow: 0 0 6px rgba(10, 35, 66, 0.3);
+  outline: none;
 }
 
-/* ================================
-   Buttons
-================================= */
+/* -------------------------------
+   BUTTONS (Navbar Blue Gradient)
+--------------------------------*/
 form button {
-    padding: 0.55rem 0.9rem; /* smaller padding */
-    border: none;
-    border-radius: 6px;
-    background-color: #007BFF;
-    color: white;
-    font-size: 0.9rem; /* smaller font */
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 0.4rem; /* reduced from 0.5rem */
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(to right, #0a2342, #0b315e);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 form button:hover {
-    background-color: #0056b3;
+  background: linear-gradient(to right, #0b315e, #0c447a);
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(10, 35, 66, 0.3);
 }
 
-/* Forgot Password Button as Link */
+/* Forgot Password Button (as link) */
 #forgotPasswordBtn {
-    background: none;
-    color: #007BFF;
-    padding: 0;
-    font-size: 0.8rem; /* smaller font */
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s;
+  background: none;
+  color: #0a2342;
+  padding: 0;
+  font-size: 0.85rem;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-weight: 500;
 }
 
 #forgotPasswordBtn:hover {
-    color: #0056b3;
+  color: #0b315e;
 }
 
-/* ================================
-   Footer Links (Signup/Login)
-================================= */
+/* -------------------------------
+   FOOTER LINKS (Signup / Login)
+--------------------------------*/
 .form-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.4rem; /* reduced from 0.5rem */
-    font-size: 0.8rem; /* slightly smaller */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
 }
 
 .form-footer a {
-    color: #007BFF;
-    text-decoration: none;
-    transition: color 0.2s;
+  color: #0a2342;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
 }
 
 .form-footer a:hover {
-    color: #0056b3;
+  color: #0b315e;
 }
 
-/* ================================
-   Forgot Password Form
-================================= */
+/* -------------------------------
+   FORGOT PASSWORD FORM (Optional)
+--------------------------------*/
 #forgotForm {
-    margin-top: 0.8rem; /* reduced from 1rem */
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem; /* reduced gap */
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 #forgotForm input {
-    width: 100%;
+  width: 100%;
 }
 
 #forgotForm button {
-    width: 100%;
-    padding: 0.5rem; /* smaller padding */
-    font-size: 0.9rem; /* smaller font */
+  width: 100%;
+  padding: 0.55rem;
+  font-size: 0.95rem;
 }
 
-/* ================================
-   Responsive
-================================= */
+/* -------------------------------
+   RESPONSIVE DESIGN
+--------------------------------*/
 @media (max-width: 500px) {
-    form {
-        padding: 1rem; /* smaller padding for mobile */
-    }
+  form {
+    padding: 1.5rem;
+    max-width: 320px;
+  }
+
+  form h2 {
+    font-size: 1.2rem;
+  }
 }

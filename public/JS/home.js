@@ -146,49 +146,6 @@ async function display() {
 
 display();
 
-/* PREMIUM USER CHECK AND FEATURES */
-async function premiumFeatures() {
-    const token = localStorage.getItem("token");
-
-    try {
-        const { status } = (await axios.get("/premium/status", {
-            headers: { Authorization: `Bearer ${token}` }
-        })).data;
-
-        if (status !== "SUCCESSFUL") return;
-
-        const buyPremiumBtn = document.querySelector("#renderBtn");
-        if (buyPremiumBtn) buyPremiumBtn.style.display = "none";
-
-        document.querySelector("#premiumUser").innerHTML = `<p>You are a premium user now</p>`;
-
-        const leaderBtn = document.querySelector("#leaderBtn");
-        leaderBtn.innerHTML = '';
-        const leaderBoardBtn = document.createElement("button");
-        leaderBoardBtn.textContent = "Show LeaderBoard";
-        leaderBoardBtn.onclick = () => window.location.href = "leaderboard.html";
-        leaderBtn.appendChild(leaderBoardBtn);
-
-        generateReport();
-    } catch (err) {
-        console.error("Unable to fetch premium status", err);
-    }
-}
-
-/* REPORT GENERATION */
-function generateReport() {
-    const reportDiv = document.getElementById("reportDiv");
-    reportDiv.innerHTML = `
-        <input type="number" placeholder="Enter your monthly salary" id="salaryInput" />
-        <button id="generateReportBtn">Generate Report</button>
-    `;
-    document.getElementById("generateReportBtn").onclick = () => {
-        const salary = document.getElementById("salaryInput").value.trim();
-        if (!salary) return alert("Please enter your salary");
-        localStorage.setItem("userSalary", salary);
-        window.location.href = "report.html";
-    };
-}
 
 /* BUY PREMIUM BUTTON */
 document.getElementById("renderBtn").addEventListener("click", async () => {
@@ -208,6 +165,12 @@ document.getElementById("renderBtn").addEventListener("click", async () => {
         const message = err.response?.data?.error || err.message;
         alert("Error starting payment: " + message);
     }
+});
+
+/* LOGOUT BUTTON */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login.html";
 });
 
 /* DOWNLOAD EXPENSES */

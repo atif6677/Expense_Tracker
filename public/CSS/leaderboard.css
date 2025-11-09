@@ -1,20 +1,35 @@
-/* Leaderboard styles */
+/* =========================================
+   LEADERBOARD PAGE STYLES
+========================================= */
+
+/* -------------------------------
+   MAIN CONTAINER
+--------------------------------*/
 .leaderboard-container {
-  max-width: 500px;
-  margin: 30px auto;
-  padding: 20px;
-  background: #fff;
+  max-width: 800px;
+  margin: 50px auto;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 30px;
   text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .leaderboard-container h2 {
-  margin-bottom: 15px;
-  font-size: 1.4rem;
-  color: #333;
+  color: #0a2342;
+  font-size: 26px;
+  margin-bottom: 10px;
 }
 
+.leaderboard-desc {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 25px;
+}
+
+/* -------------------------------
+   LEADERBOARD LIST
+--------------------------------*/
 .leaderboard-list {
   list-style: none;
   padding: 0;
@@ -22,11 +37,38 @@
 }
 
 .leaderboard-list li {
-  background: #f9f9f9;
-  margin: 8px 0;
-  padding: 12px;
+  background: #f8f9fb;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 1rem;
-  color: #444;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  margin: 10px 0;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.leaderboard-list li:hover {
+  background: #e9f4ff;
+  transform: scale(1.02);
+}
+
+.leaderboard-list li span {
+  color: #0a2342;
+  font-weight: 600;
+}
+
+/* -------------------------------
+   RESPONSIVE DESIGN
+--------------------------------*/
+@media (max-width: 768px) {
+  .leaderboard-container {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .leaderboard-list li {
+    font-size: 14px;
+  }
 }

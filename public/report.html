@@ -3,54 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expense Report</title>
-  <link rel="stylesheet" href="./CSS/report.css">
+  <title>Expense Tracker - Report</title>
+  <link rel="stylesheet" href="./CSS/common.css">
+  <link rel="stylesheet" href="./CSS/report.css" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
 
-  <h3>Your Expense Report</h3>
-  
-  <select id="filterSelect">
-    <option value="">--Select Report Type--</option>
-    <option value="daily">Daily</option>
-    <option value="monthly">Monthly</option>
-  </select>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">Expense Tracker</div>
 
-  <div id="dateContainer" style="margin-top:10px;"></div>
+    <nav class="nav-links">
+      <a href="./home.html">Home</a>
+      <a href="./report.html" class="active">Report</a>
+      <a href="./leaderboard.html">Leaderboard</a>
+      <a href="./about.html">About</a>
+    </nav>
 
-  <button id="generateReportBtn">Generate Report</button>
-  <button id="downloadBtn">Download CSV</button>
+    <div class="nav-actions">
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  </header>
 
-  <label for="rowsPerPage">Rows per page:</label>
-  <select id="rowsPerPage">
-    <option value="10">10</option>
-    <option value="20">20</option>
-    <option value="40">40</option>
-  </select>
+  <!-- MAIN REPORT CONTENT -->
+  <main class="report-container">
+    <h2>Your Expense Report</h2>
+    <p class="report-desc">Generate daily or monthly expense summaries and track your savings.</p>
 
-  <!-- Monthly Summary -->
-  <div id="monthlySummary"></div>
+    <div class="filters">
+      <div class="input-group">
+        <label for="salaryInput">Salary (₹):</label>
+        <input type="number" id="salaryInput" placeholder="Enter your salary" min="1" required />
+      </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Amount</th>
-        <th>Description</th>
-        <th>Category</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody id="reportTableBody"></tbody>
-  </table>
+      <div class="input-group">
+        <label for="filterSelect">Report Type:</label>
+        <select id="filterSelect">
+          <option value="">--Select Type--</option>
+          <option value="daily">Daily</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
 
-  <!-- Pagination controls -->
-  <div>
-    <button id="prevPageBtn">Prev</button>
-    <span id="pageIndicator"></span>
-    <button id="nextPageBtn">Next</button>
-  </div>
+      <div id="dateContainer" class="input-group"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="JS/report.js"></script>
+      <div class="btn-group">
+        <button id="generateReportBtn" disabled>Generate Report</button>
+        <button id="downloadBtn" disabled>Download CSV</button>
+      </div>
+
+      <div class="input-group">
+        <label for="rowsPerPage">Rows per page:</label>
+        <select id="rowsPerPage">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="40">40</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div id="monthlySummary" class="summary-box"></div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="reportTableBody">
+          <tr><td colspan="4">No data yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+      <button id="prevPageBtn">Prev</button>
+      <span id="pageIndicator">Page 1</span>
+      <button id="nextPageBtn">Next</button>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <p>© 2025 Expense Tracker. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = './login.html';
+    });
+  </script>
+
+  <script src="./JS/report.js"></script>
 </body>
 </html>

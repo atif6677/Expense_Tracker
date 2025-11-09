@@ -1,123 +1,286 @@
-/* Premium User Thin Line */
-/* Reset body margin/padding */
+/* =========================================
+   HOME PAGE STYLING (Final Fixed Version)
+========================================= */
+
+/* -------------------------------
+   GLOBAL
+--------------------------------*/
 body {
-  margin: 0px;
-  padding: 10px;
-  padding-top: 0px;
+  font-family: "Poppins", sans-serif;
+  background: #f5f7fa;
+  color: #222;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* Full-width Header */
-.main-header {
-  background-color: #2b5a8b;
-  color: white;
-  padding: 12px 20px;
-  margin: 0;                   /* remove margin */
-  width: 100%;                 /* full width */
-  box-sizing: border-box;       /* include padding in width */
-
+/* -------------------------------
+   NAVBAR (Same as Leaderboard)
+--------------------------------*/
+.navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(to right, #0a2342, #0b315e);
+  padding: 12px 40px;
+  border-radius: 10px;
+  margin: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.main-header h3 {
-  margin: 0;
-  font-size: 1.4rem;
-  letter-spacing: 1px;
-}
-
-/* Premium User inside header */
-#premiumUser {
-  font-size: 0.85rem;
+.logo {
+  font-size: 22px;
+  font-weight: bold;
   color: #fff;
+  letter-spacing: 0.5px;
+  margin-right: 20px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 35px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
   font-weight: 500;
-  margin-left: auto;
+  transition: color 0.3s;
 }
 
+.nav-links a:hover,
+.nav-links a.active {
+  color: #00bfff;
+}
 
-/* Table styling */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Premium Button */
+.premium-btn {
+  background-color: #ffc107;
+  color: #222;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.premium-btn:hover {
+  background-color: #e0a800;
+  transform: scale(1.05);
+}
+
+/* Logout Button */
+.logout-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* -------------------------------
+   FORM STYLING
+--------------------------------*/
+form {
+  background: #ffffff;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+form:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+form label {
+  font-weight: 600;
+  color: #0a2342;
+}
+
+form input,
+form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+form input:focus,
+form select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+form button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+form button:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+/* -------------------------------
+   EXPENSE LIST SECTION
+--------------------------------*/
+.expense-section {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.expense-section h3 {
+  color: #0a2342;
+}
+
+.expense-section select {
+  margin-left: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* -------------------------------
+   TABLE
+--------------------------------*/
 table {
-  width: 100%;
+  width: 90%;
+  margin: 25px auto;
   border-collapse: collapse;
-  margin-top: 0.8rem;
-  font-size: 0.9rem;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
-  border: 1px solid #000;
-  padding: 6px;
-  text-align: left;
+th,
+td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
 th {
-  background: #f2f2f2;
-}
-
-/* Buttons */
-button {
-  padding: 0.45rem 0.9rem;
-  margin: 0.3rem 0.2rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #0d81fd;
+  background-color: #0a2342;
   color: white;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-button:hover {
-  background-color: #0056b3;
+tr:nth-child(even) {
+  background-color: #f8f9fb;
 }
 
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-label {
-  font-weight: bold;
-  margin-top: 0.5rem;
-}
-
-/* Inputs and selects */
-input, select {
-  padding: 0.4rem 0.8rem;
-  margin: 0.2rem 0.2rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 0.85rem;
-  transition: border 0.2s, box-shadow 0.2s;
-}
-
-input:focus, select:focus {
-  border-color: #007BFF;
-  outline: none;
-  box-shadow: 0 0 4px rgba(0,123,255,0.3);
-}
-
-#leaderBtn, #reportDiv {
-  display: inline-block; /* default is block, so side-by-side won't happen */
-  margin: 0 5px; /* optional spacing */
-}
-
-
-#expenseListHeader {
-  background-color: #2b5a8b; /* sub-header color */
-  color: white;
-  padding: 8px 16px;
-  margin-right: 1200px;
-  display: inline-block;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  font-size: 1.1rem;
-  letter-spacing: 1px;
-
-     /* higher than other elements */
+tr:hover {
+  background-color: #e9f4ff;
+  transition: background 0.3s ease;
 }
 
 .actionsWidth {
-  width: 300px; /* Adjust as needed */
+  width: 120px;
+}
+
+/* -------------------------------
+   BUTTONS (Pagination / Download)
+--------------------------------*/
+#prevBtn,
+#nextBtn,
+#downloadExpences {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  margin: 10px 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+}
+
+#prevBtn:hover,
+#nextBtn:hover,
+#downloadExpences:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+/* -------------------------------
+   FOOTER
+--------------------------------*/
+.main-footer {
+  background: linear-gradient(to right, #0a2342, #0b315e);
+  color: #fff;
+  text-align: center;
+  padding: 15px 0;
+  margin-top: auto;
+  border-radius: 10px 10px 0 0;
+  font-size: 14px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* -------------------------------
+   RESPONSIVE DESIGN
+--------------------------------*/
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  form {
+    width: 90%;
+    padding: 20px;
+  }
+
+  table {
+    width: 95%;
+    font-size: 14px;
+  }
 }

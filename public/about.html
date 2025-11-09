@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Expense Tracker</title>
+  <link rel="stylesheet" href="./CSS/common.css">
+  <link rel="stylesheet" href="./CSS/about.css">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">Expense Tracker</div>
+
+    <nav class="nav-links">
+      <a href="./home.html">Home</a>
+      <a href="./report.html">Report</a>
+      <a href="./leaderboard.html">Leaderboard</a>
+      <a href="./about.html" class="active">About</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <!-- ABOUT CONTENT -->
+  <section class="about-section">
+    <h1>About Expense Tracker</h1>
+    <p class="intro">
+      Expense Tracker is a simple and powerful web application designed to help users manage their daily expenses and spending habits effectively.
+      With an intuitive interface, it allows you to record, view, and analyze your expenses anytime, anywhere.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h2>💰 Easy Expense Management</h2>
+        <p>
+          Quickly add your expenses by entering the <strong>amount</strong>, <strong>description</strong>, and <strong>category</strong>.  
+          Everything is stored securely, and you can easily edit or delete them when needed.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2>⭐ Premium Membership</h2>
+        <p>
+          Upgrade to Premium to unlock exclusive features like the <strong>Leaderboard</strong> and <strong>Expense Reports</strong>.
+          These tools help you compare your spending with others and gain deep insights into your financial habits.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2>📊 Reports & Insights</h2>
+        <p>
+          View detailed visual reports to understand where your money goes.
+          Analyze your spending by category and make smarter financial decisions.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <h2>🏆 Leaderboard</h2>
+        <p>
+          Compete with other users based on how effectively you manage your expenses.
+          Track your performance and stay motivated to save more.
+        </p>
+      </div>
+    </div>
+
+    <div class="about-footer-text">
+      <p>
+        Expense Tracker helps you stay in control of your finances by combining simplicity with smart insights.  
+        Whether you're tracking personal spending or managing business expenses, it’s built to make money management stress-free.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <p>© 2025 Expense Tracker. All rights reserved.</p>
+  </footer>
+
+  <!-- Logout functionality -->
+  <script>
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "./login.html";
+    });
+  </script>
+</body>
+</html>

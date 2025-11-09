@@ -9,78 +9,82 @@
 </head>
 <body>
 
- 
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">Expense Tracker</div>
 
-  <header class="main-header">
-    <h3>Expense Tracker</h3>
-    <div id="premiumUser"></div>
-    <div class="row">
-      <button id="renderBtn">Buy Premium</button>
-  </div>
+    <nav class="nav-links">
+      <a href="./home.html">Home</a>
+      <a href="./report.html">Report</a>
+      <a href="./leaderboard.html">Leaderboard</a>
+      <a href="./about.html">About</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button id="renderBtn" class="premium-btn">Buy Premium</button>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
   </header>
-  
-  <div id="leaderBtn"></div>
-  <div id="reportDiv"></div>
 
-
-  
-
-  <!-- Add Expense Form -->
+  <!-- ADD EXPENSE FORM -->
   <form onsubmit="home(event)">
-      <label for="amount">Expense Amount:</label>
-      <input type="number" id="amount" name="amount" required>
+    <label for="amount">Expense Amount:</label>
+    <input type="number" id="amount" name="amount" required>
 
-      <label for="description">Description:</label>
-      <input type="text" id="description" name="description" required>
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description" required>
 
-      <label for="category">Category:</label>
-      <select id="category" name="category" required>
-          <option value="food">Food</option>
-          <option value="fuel">Fuel</option>
-          <option value="entertainment">Entertainment</option>
-          <option value="rent">Rent</option>
-          <option value="travel">Travel</option>
-      </select>
+    <label for="category">Category:</label>
+    <select id="category" name="category" required>
+      <option value="food">Food</option>
+      <option value="fuel">Fuel</option>
+      <option value="entertainment">Entertainment</option>
+      <option value="rent">Rent</option>
+      <option value="travel">Travel</option>
+    </select>
 
-      <button type="submit">Add Expense</button>
+    <button type="submit">Add Expense</button>
   </form>
 
-  
-
-  <!-- Expense List -->
+  <!-- EXPENSE LIST -->
   <div>
-      <h3 id="expenseListHeader">Expense List</h3>
+    <h3 id="expenseListHeader">Expense List</h3>
 
-      <label for="rowsPerPage">Rows per page:</label>
-      <select id="rowsPerPage">
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
-          <option value="40">40</option>
-      </select>
+    <label for="rowsPerPage">Rows per page:</label>
+    <select id="rowsPerPage">
+      <option value="10" selected>10</option>
+      <option value="20">20</option>
+      <option value="40">40</option>
+    </select>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th class="actionsWidth">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="expenseList"></tbody>
-      </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th class="actionsWidth">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="expenseList"></tbody>
+    </table>
 
-      <!-- Pagination -->
-      <div>
-          <button id="prevBtn">Prev</button>
-          <span id="pageInfo"></span>
-          <button id="nextBtn">Next</button>
-      </div>
+    <!-- PAGINATION -->
+    <div>
+      <button id="prevBtn">Prev</button>
+      <span id="pageInfo"></span>
+      <button id="nextBtn">Next</button>
+    </div>
   </div>
 
   <button id="downloadExpences">Download Expenses</button>
-  
 
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <p>© 2025 Expense Tracker. All rights reserved.</p>
+  </footer>
+
+  <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="./JS/home.js"></script>
 </body>

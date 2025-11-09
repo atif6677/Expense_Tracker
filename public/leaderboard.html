@@ -4,18 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Expense Tracker - Leaderboard</title>
-  <link rel="stylesheet" href="./CSS/leaderboard.css"> <!-- Reuse same CSS -->
+  <link rel="stylesheet" href="./CSS/leaderboard.css">
+  <link rel="stylesheet" href="./CSS/common.css">
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">Expense Tracker</div>
 
+    <nav class="nav-links">
+      <a href="./home.html">Home</a>
+      <a href="./report.html">Report</a>
+      <a href="./leaderboard.html" class="active">Leaderboard</a>
+      <a href="./about.html">About</a>
+    </nav>
 
+    <div class="nav-actions">
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
   <main class="leaderboard-container">
     <h2>Global Expense Leaderboard</h2>
+    <p class="leaderboard-desc">Top users who manage their expenses most efficiently.</p>
+
     <ul id="leaderboardList" class="leaderboard-list">
       <li>Loading leaderboard...</li>
     </ul>
   </main>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <p>© 2025 Expense Tracker. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = './login.html';
+    });
+  </script>
 
   <script src="./JS/leaderboard.js"></script>
 </body>
