@@ -91,7 +91,7 @@ function updatePageInfo() {
     document.querySelector("#pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
 }
 
-/* ✅ Simplified deleteExpense logic */
+/*  deleteExpense logic */
 async function deleteExpense(id) { 
     const token = localStorage.getItem("token");
     if (!confirm("Are you sure you want to delete this expense?")) return;
@@ -115,7 +115,7 @@ async function deleteExpense(id) {
     }
 }
 
-/* ✅ Use Event Delegation for Delete Buttons */
+/* Use Event Delegation for Delete Buttons */
 document.getElementById("expenseList").addEventListener("click", async e => {
     if (e.target.classList.contains("delete-btn")) {
         const row = e.target.closest("tr");
@@ -148,10 +148,68 @@ document.getElementById("nextBtn").addEventListener("click", async () => {
 
 async function display() {
     await fetchExpenses();
-    premiumFeatures();
+    checkPremiumStatus();
 }
 
 display();
+
+
+//check user is premium or not
+async function checkPremiumStatus(redirectIfNotPremium = false) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+  window.location.href = "./login.html";
+  return;
+  }
+
+  try {
+    const res = await axios.get("/premium/status", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const status = res.data.status;
+    const buyBtn = document.getElementById("renderBtn");
+    const leaderboardLink = document.querySelector('a[href="./leaderboard.html"]');
+    const reportLink = document.querySelector('a[href="./report.html"]');
+
+    if (status === "SUCCESSFUL") {
+      // ✅ Premium user
+      if (buyBtn) buyBtn.style.display = "none";
+      leaderboardLink?.classList.remove("disabled-link");
+      reportLink?.classList.remove("disabled-link");
+
+      // 🌟 Add "Premium User" text (only once)
+      if (!document.querySelector(".premium-badge")) {
+        const badge = document.createElement("span");
+        badge.textContent = "🌟 Premium User";
+        badge.classList.add("premium-badge");
+        document.querySelector(".nav-actions").prepend(badge);
+      }
+    } else {
+      // 🚫 Non-premium user
+      if (buyBtn) buyBtn.style.display = "inline-block";
+
+      [leaderboardLink, reportLink].forEach(link => {
+        if (link) {
+          link.classList.add("disabled-link");
+          link.addEventListener(
+            "click",
+            e => {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              alert("🚫 This feature is available only for Premium Users.");
+            },
+            { capture: true }
+          );
+        }
+      });
+    }
+  } catch (err) {
+    console.error("Error checking premium status:", err);
+  }
+}
+
+
 
 
 /* BUY PREMIUM BUTTON */

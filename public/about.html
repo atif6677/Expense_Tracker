@@ -52,8 +52,9 @@
       <div class="feature-card">
         <h2>📊 Reports & Insights</h2>
         <p>
-          View detailed visual reports to understand where your money goes.
-          Analyze your spending by category and make smarter financial decisions.
+          View detailed visual reports to understand how much do you spend on monthly or
+          daily basis and where your money goes.
+          Analyze your spending and know your savings.
         </p>
       </div>
 
@@ -79,12 +80,8 @@
     <p>© 2025 Expense Tracker. All rights reserved.</p>
   </footer>
 
-  <!-- Logout functionality -->
-  <script>
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.removeItem("token");
-      window.location.href = "./login.html";
-    });
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="./JS/about.js"></script>
+
 </body>
 </html>

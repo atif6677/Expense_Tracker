@@ -7,6 +7,6 @@ const { premiumContent, leaderboard } = require("../controllers/premiumUserContr
 router.get("/status", auth, premiumContent);
 
 // Get the leaderboard
-router.get("/leaderboard", leaderboard);
+router.get("/leaderboard",leaderboard);
 
 module.exports = router;

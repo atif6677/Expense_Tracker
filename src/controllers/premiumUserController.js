@@ -29,7 +29,7 @@ const leaderboard = async (req, res) => {
         "name",
         ["totalExpenses", "totalExpense"] // Alias to match front-end expectation
       ],
-      order: [["totalExpenses", "DESC"]]
+      order: [["totalExpenses", "ASC"]]
     });
 
     res.json(leaderboard);

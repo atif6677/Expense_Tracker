@@ -83,3 +83,9 @@
     font-size: 26px;
   }
 }
+.disabled-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}

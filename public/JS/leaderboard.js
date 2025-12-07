@@ -1,16 +1,22 @@
-// Function to fetch and render the leaderboard data
+
 // 🚫 Block unauthorized users
 const token = localStorage.getItem("token");
 if (!token) {
   window.location.href = "./login.html";
 }
 
+// Function to fetch and render the leaderboard data
 async function fetchAndRenderLeaderboard() {
     const ul = document.getElementById("leaderboardList");
     ul.innerHTML = "<li>Fetching data...</li>";
 
     try {
-        const res = await axios.get("/premium/leaderboard");
+        
+        const res = await axios.get("/premium/leaderboard", {
+            
+           
+        });
+
         const data = res.data;
         
         ul.innerHTML = ""; // Clear the loading message
@@ -40,3 +46,9 @@ async function fetchAndRenderLeaderboard() {
 
 // Automatically call the function when the page loads
 document.addEventListener("DOMContentLoaded", fetchAndRenderLeaderboard);
+
+// Logout Function
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "./login.html";
+});

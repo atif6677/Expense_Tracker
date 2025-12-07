@@ -8,6 +8,7 @@ async function signup(event) {
    const email = document.querySelector("#email").value.trim();
    const password = document.querySelector("#password").value.trim();
 
+
    const userData = {
         name,   
         email,     
@@ -17,8 +18,11 @@ async function signup(event) {
     try {
 
         await axios.post("/signup", userData);
+        //clear inputs
+        event.target.reset();
 
         window.location.href = "../login.html";
+
 
     } catch (err) {
         if (err.response) {
@@ -28,6 +32,5 @@ async function signup(event) {
         }
     }
 
-    // clear inputs
-    event.target.reset();
+    
 }

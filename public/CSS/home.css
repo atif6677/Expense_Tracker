@@ -222,7 +222,7 @@ tr:hover {
 #prevBtn,
 #nextBtn,
 #downloadExpences {
-  background-color: #007bff;
+  background-color: #0171e9;
   color: #fff;
   border: none;
   padding: 8px 16px;
@@ -232,6 +232,11 @@ tr:hover {
   font-weight: 600;
   transition: background 0.3s, transform 0.2s;
 }
+#downloadExpences {
+  display: inline-block;
+  width: auto !important;
+}
+
 
 #prevBtn:hover,
 #nextBtn:hover,
@@ -283,4 +288,26 @@ tr:hover {
     width: 95%;
     font-size: 14px;
   }
+}
+.disabled-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+
+
+/* Premium User Badge */
+.premium-badge {
+  color: #fff; /* ✅ white text color */
+ 
+}
+
+
+#downloadExpences {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: fit-content !important;
+  align-self: flex-start !important;
 }

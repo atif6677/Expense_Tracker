@@ -27,7 +27,5 @@ User.hasMany(Order, {
 });
 Order.belongsTo(User);
 
-console.log("📦 Order model initialized with fields: id, orderId, status");
-console.log("🔗 Associations set: User.hasMany(Order), Order.belongsTo(User)");
 
 module.exports = Order;
