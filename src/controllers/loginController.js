@@ -14,7 +14,7 @@ const loginUser = async (req, res) => {
     }
 
     // check if user exists
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email }); // Removed 'where'
     if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
@@ -25,8 +25,8 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ error: "Incorrect password" });
     }
 
-    // Generate JWT
-    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
+    // Generate JWT (Use _id for MongoDB)
+    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -36,7 +36,6 @@ const loginUser = async (req, res) => {
     });
   } catch (error) {
        console.error('Login Error:', error);
-        // 500 Internal Server Error for unexpected issues (like DB connection failure)
         res.status(500).json({ error: 'Failed to complete Login. Please try again later.' });
   }
 };

@@ -1,30 +1,26 @@
-// homeModel.js
-const { DataTypes } = require('sequelize');
-const db = require('../utils/database');
-const User = require('./signupModel'); // import User model
+// src/models/homeModel.js
 
-const Expense = db.define('expense', {
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const expenseSchema = new Schema({
     amount: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+        type: Number,
+        required: true
     },
     description: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: String,
+        required: true
     },
     category: {
-        type: DataTypes.STRING,
-        allowNull: false
+        type: String,
+        required: true
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User', 
+        required: true
     }
-});
+}, { timestamps: true }); // ✅ THIS WAS MISSING
 
-// ✅ Associations (will auto-create userId column in Expense)
-User.hasMany(Expense, { foreignKey: "userId", onDelete: "CASCADE" });
-Expense.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
-
-module.exports = Expense;
+module.exports = mongoose.model('Expense', expenseSchema);

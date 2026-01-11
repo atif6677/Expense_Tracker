@@ -1,22 +1,21 @@
-//src/models/forgotPasswordModel.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../utils/database');
-const User = require('./signupModel');
+// src/models/forgotPasswordModel.js
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const ForgotPasswordRequest = sequelize.define('ForgotPasswordRequest', {
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
-  },
-  isActive: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true
-  }
+const forgotPasswordSchema = new Schema({
+    _id: { // If you generate your own UUIDs for links, keep this. If not, remove it to let Mongo use its own IDs.
+        type: String, 
+        required: true 
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 });
 
-// ✅ Setup association so Sequelize creates `UserId` column
-User.hasMany(ForgotPasswordRequest);
-ForgotPasswordRequest.belongsTo(User);
-
-module.exports = ForgotPasswordRequest;
+module.exports = mongoose.model('ForgotPasswordRequest', forgotPasswordSchema);

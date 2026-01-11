@@ -1,31 +1,23 @@
 // models/orderModel.js
 
-const { DataTypes } = require("sequelize");
-const sequelize = require("../utils/database");
-const User = require("./signupModel");
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const Order = sequelize.define("Order", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  orderId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+const orderSchema = new Schema({
+    orderId: {
+        type: String,
+        required: true
+    },
+    status: {
+        type: String,
+        required: true
+    },
+    paymentid: String, // Store payment ID if needed
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 });
 
-// Association (very important!)
-User.hasMany(Order, {
-  foreignKey: { allowNull: false }, // ensures no orphan orders
-  onDelete: "CASCADE",
-});
-Order.belongsTo(User);
-
-
-module.exports = Order;
+module.exports = mongoose.model('Order', orderSchema);

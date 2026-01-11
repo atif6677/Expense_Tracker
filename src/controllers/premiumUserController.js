@@ -7,7 +7,8 @@ const User = require("../models/signupModel");
 const premiumContent = async (req, res) => {
   try {
     const userStatus = await Order.findOne({
-      where: { UserId: req.user.userId, status: "SUCCESSFUL" }
+      userId: req.user.userId, 
+      status: "SUCCESSFUL" 
     });
 
     if (!userStatus) {
@@ -24,15 +25,20 @@ const premiumContent = async (req, res) => {
 // Fetch leaderboard based on total expenses
 const leaderboard = async (req, res) => {
   try {
-    const leaderboard = await User.findAll({
-      attributes: [
-        "name",
-        ["totalExpenses", "totalExpense"] // Alias to match front-end expectation
-      ],
-      order: [["totalExpenses", "ASC"]]
-    });
+    // MongoDB aggregation or simple find with sort
+    // We select 'name' and 'totalExpenses'
+    const leaderboard = await User.find()
+      .select("name totalExpenses")
+      .sort({ totalExpenses: 1 }); // 1 for ASC, -1 for DESC
 
-    res.json(leaderboard);
+    // If front-end expects strict "totalExpense" key, map it, 
+    // or just ensure front-end uses "totalExpenses"
+    const formattedLeaderboard = leaderboard.map(user => ({
+        name: user.name,
+        totalExpense: user.totalExpenses // Mapping to match previous alias
+    }));
+
+    res.json(formattedLeaderboard);
   } catch (err) {
     console.error("Error fetching leaderboard:", err);
     res.status(500).json({ error: "Failed to fetch leaderboard" });

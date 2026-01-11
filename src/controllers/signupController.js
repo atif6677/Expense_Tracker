@@ -15,7 +15,7 @@ const addUserSignup = async (req, res) => {
         }
         
         // 2. Check if email already exists
-        const existingUser = await User.findOne({ where: { email } });
+        const existingUser = await User.findOne({ email }); // Mongoose syntax
         if (existingUser) {
             return res.status(409).json({ error: "User already exists" });
         }
@@ -24,13 +24,20 @@ const addUserSignup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // 4. Create the new user
-        const user = await User.create({ name, email, password: hashedPassword });
+        const user = new User({ 
+            name, 
+            email, 
+            password: hashedPassword,
+            totalExpenses: 0 // Initialize defaults if not set in schema
+        });
+        
+        await user.save();
         
         // 5. Success Response
         res.status(201).json({
             message: "New user added successfully",
             user: {
-                id: user.id,
+                id: user._id, // MongoDB uses _id
                 name: user.name,
                 email: user.email
             }
@@ -38,7 +45,6 @@ const addUserSignup = async (req, res) => {
 
     } catch (error) {
         console.error('Signup Error:', error);
-        // 500 Internal Server Error for unexpected issues (like DB connection failure)
         res.status(500).json({ error: 'Failed to complete signup. Please try again later.' });
     }
 };

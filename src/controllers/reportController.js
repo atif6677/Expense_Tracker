@@ -1,7 +1,6 @@
 // src/controllers/reportController.js
 
 const Expense = require('../models/homeModel');
-const { Op } = require('sequelize');
 const { Parser } = require('json2csv');
 
 // 📌 Helper to build date filter based on query
@@ -9,20 +8,32 @@ const getDateCondition = (filter, date, month, year) => {
     let dateCondition = {};
 
     if (filter === 'daily' && date) {
+        // 'date' string is usually YYYY-MM-DD
         const selectedDate = new Date(date);
-        selectedDate.setHours(0, 0, 0, 0);
+        selectedDate.setHours(0, 0, 0, 0); // Start of day (Local Server Time)
+        
         const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
-        dateCondition = { createdAt: { [Op.between]: [selectedDate, endOfDay] } };
+        endOfDay.setHours(23, 59, 59, 999); // End of day (Local Server Time)
+        
+        dateCondition = { createdAt: { $gte: selectedDate, $lte: endOfDay } };
+        
     } else if (filter === 'monthly' && month && year) {
-        const startOfMonth = new Date(year, month - 1, 1, 0, 0, 0);
-        const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
-        dateCondition = { createdAt: { [Op.between]: [startOfMonth, endOfMonth] } };
+        // ✅ FIX: Convert query strings to Numbers
+        const yearNum = parseInt(year);
+        const monthNum = parseInt(month); 
+
+        // monthNum - 1 because JS months are 0-11
+        const startOfMonth = new Date(yearNum, monthNum - 1, 1, 0, 0, 0);
+        const endOfMonth = new Date(yearNum, monthNum, 0, 23, 59, 59, 999);
+        
+        dateCondition = { createdAt: { $gte: startOfMonth, $lte: endOfMonth } };
+        
     } else if (filter === 'weekly') {
         const now = new Date();
         const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
         startOfWeek.setHours(0, 0, 0, 0);
-        dateCondition = { createdAt: { [Op.gte]: startOfWeek } };
+        
+        dateCondition = { createdAt: { $gte: startOfWeek } };
     }
 
     return dateCondition;
@@ -33,18 +44,18 @@ const getReportExpenses = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const offset = (page - 1) * limit;
+        const skip = (page - 1) * limit;
         const { filter, date, month, year, salary } = req.query;
 
         const dateCondition = getDateCondition(filter, date, month, year);
         const whereClause = { userId: req.user.userId, ...dateCondition };
 
-        const { count, rows } = await Expense.findAndCountAll({
-            where: whereClause,
-            limit,
-            offset,
-            order: [['createdAt', 'DESC']]
-        });
+        const count = await Expense.countDocuments(whereClause);
+        
+        const rows = await Expense.find(whereClause)
+            .sort({ createdAt: -1 }) 
+            .skip(skip)
+            .limit(limit);
 
         const responseData = {
             expenses: rows,
@@ -52,11 +63,16 @@ const getReportExpenses = async (req, res) => {
             totalPages: Math.ceil(count / limit)
         };
 
-        // If monthly, calculate savings
         if (filter === 'monthly' && salary && !isNaN(salary)) {
-            const totalMonthlyExpense = await Expense.sum('amount', { where: whereClause });
-            responseData.totalMonthlyExpense = totalMonthlyExpense || 0;
-            responseData.savings = parseFloat(salary) - (totalMonthlyExpense || 0);
+            const aggregation = await Expense.aggregate([
+                { $match: whereClause },
+                { $group: { _id: null, total: { $sum: "$amount" } } }
+            ]);
+            
+            const totalMonthlyExpense = aggregation.length > 0 ? aggregation[0].total : 0;
+            
+            responseData.totalMonthlyExpense = totalMonthlyExpense;
+            responseData.savings = parseFloat(salary) - totalMonthlyExpense;
         }
 
         res.status(200).json(responseData);
@@ -74,35 +90,27 @@ const downloadExpenses = async (req, res) => {
         const dateCondition = getDateCondition(filter, date, month, year);
         const whereClause = { userId: req.user.userId, ...dateCondition };
 
-        const expenses = await Expense.findAll({
-            where: whereClause,
-            attributes: ["amount", "description", "createdAt", "category"], // ✅ Only these fields
-            raw: true
-        });
+        const expenses = await Expense.find(whereClause)
+            .select("amount description createdAt category")
+            .lean();
 
         if (!expenses || expenses.length === 0) {
             return res.status(404).json({ error: "No expenses found for the selected period." });
         }
 
-        // Format data
         const csvData = expenses.map(exp => ({
             Amount: exp.amount,
             Description: exp.description,
-            Date: new Date(exp.createdAt).toISOString().split("T")[0],
+            // Safe date formatting
+            Date: exp.createdAt ? new Date(exp.createdAt).toISOString().split("T")[0] : "N/A",
             Category: exp.category
         }));
 
-        // Optional: add summary row for monthly report
         if (filter === "monthly" && salary && !isNaN(salary)) {
             const totalMonthlyExpense = expenses.reduce((sum, exp) => sum + exp.amount, 0);
             const savings = parseFloat(salary) - totalMonthlyExpense;
 
-            csvData.push({
-                Amount: "",
-                Description: "--- Summary ---",
-                Date: "",
-                Category: "",
-            });
+            csvData.push({ Amount: "", Description: "--- Summary ---", Date: "", Category: "" });
             csvData.push({
                 Amount: `Total: ${totalMonthlyExpense}`,
                 Description: `Salary: ${salary}`,
@@ -124,6 +132,5 @@ const downloadExpenses = async (req, res) => {
         res.status(500).json({ error: "Failed to generate CSV" });
     }
 };
-
 
 module.exports = { getReportExpenses, downloadExpenses };

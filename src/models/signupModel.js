@@ -1,33 +1,30 @@
 // src/models/signupModel.js
 
-const db = require("../utils/database");
-const { DataTypes } = require("sequelize");
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const User = db.define("User", {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  
-  totalExpenses: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-    allowNull: false
-  }
+const userSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    isPremiumUser: { // Often needed for expense trackers
+        type: Boolean,
+        default: false
+    },
+    totalExpenses: {
+        type: Number,
+        default: 0
+    }
 });
 
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

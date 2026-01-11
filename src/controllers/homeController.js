@@ -2,13 +2,10 @@
 
 const Expense = require('../models/homeModel');
 const User = require('../models/signupModel'); 
-const db = require('../utils/database');
 const { uploadToS3 } = require('../services/s3Services'); 
 
 const addExpense = async (req, res) => {
-    // Start a transaction
-    const t = await db.transaction();
-
+    // ❌ REMOVED: Transaction Session for local compatibility
     try {
         const { amount, description, category } = req.body;
         const userId = req.user.userId;
@@ -17,50 +14,45 @@ const addExpense = async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
-        // ✅ Step 1: Create the expense within the transaction
-        const expense = await Expense.create({
+        // ✅ Step 1: Create the expense
+        const expense = new Expense({
             amount,
             description,
             category,
             userId: userId,
-        }, { transaction: t });
+        });
+        await expense.save(); // Removed { session }
 
-        // ✅ Step 2: Update the user's total expenses
-        const user = await User.findByPk(userId, { transaction: t });
-        // Make sure amount is treated as a number
-        const newTotalExpenses = user.totalExpenses + Number(amount);
-        await user.update({ totalExpenses: newTotalExpenses }, { transaction: t });
-
-        // If everything is successful, commit the transaction
-        await t.commit();
+        // ✅ Step 2: Update the user's total expenses manually
+        // Note: Without transactions, if this fails, the expense still exists. 
+        // For a simple app, this is acceptable.
+        const user = await User.findById(userId);
+        if (user) {
+            user.totalExpenses = (user.totalExpenses || 0) + Number(amount);
+            await user.save();
+        }
 
         res.status(201).json({ message: "Expense added successfully", expense });
     } catch (error) {
-        // If any step fails, roll back the entire transaction
-        await t.rollback();
+        console.error(error);
         res.status(500).json({ error: error.message });
     }
 };
 
-
 const getExpense = async (req, res) => {
     try {
         const userId = req.user.userId;
-
-        // Read pagination query params (default page=1, limit=10)
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const offset = (page - 1) * limit;
+        const skip = (page - 1) * limit;
 
-        // Get paginated expenses + total count
-        const { rows: expenses, count: totalExpenses } = await Expense.findAndCountAll({
-            where: { userId },
-            limit,
-            offset,
-            order: [['createdAt', 'DESC']] // newest first
-        });
+        const totalExpenses = await Expense.countDocuments({ userId });
 
-        // Send data + meta info for pagination
+        const expenses = await Expense.find({ userId })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
         res.status(200).json({
             expenses,
             totalExpenses,
@@ -72,59 +64,47 @@ const getExpense = async (req, res) => {
     }
 };
 
-
-
 const deleteExpense = async (req, res) => {
-    // Start a transaction
-    const t = await db.transaction();
-
+    // ❌ REMOVED: Transaction Session
     try {
         const { id } = req.params;
         const userId = req.user.userId;
 
-        // ✅ Step 1: Find the expense to be deleted
-        const expense = await Expense.findOne({
-            where: { id, userId: userId },
-            transaction: t,
-        });
+        const expense = await Expense.findOne({ _id: id, userId: userId });
 
         if (!expense) {
-            await t.rollback();
             return res.status(404).json({ error: "Expense not found or not authorized" });
         }
 
         const expenseAmount = expense.amount;
 
-        // ✅ Step 2: Update the user's total expenses by subtracting the amount
-        const user = await User.findByPk(userId, { transaction: t });
-        const newTotalExpenses = user.totalExpenses - expenseAmount;
-        await user.update({ totalExpenses: newTotalExpenses }, { transaction: t });
+        // ✅ Step 2: Delete the expense
+        await Expense.deleteOne({ _id: id });
 
-        // ✅ Step 3: Destroy the expense record
-        await expense.destroy({ transaction: t });
+        // ✅ Step 3: Update User total
+        const user = await User.findById(userId);
+        if (user) {
+            user.totalExpenses = (user.totalExpenses || 0) - expenseAmount;
+            await user.save();
+        }
 
-        // If everything succeeds, commit the transaction
-        await t.commit();
         res.status(200).json({ message: "Expense deleted successfully" });
     } catch (err) {
-        // If any step fails, roll back
-        await t.rollback();
-        // Standardized the error key from 'err' to 'error'
+        console.error(err);
         res.status(500).json({ error: "Something went wrong" });
     }
 };
 
-
-
 const downloadExpenses = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const expenses = await Expense.findAll({ where: { userId } });
+    const expenses = await Expense.find({ userId }).lean();
 
     const stringifiedExpenses = JSON.stringify(expenses);
     const filename = `Expense${userId}.txt`;
 
-    const fileURL = await uploadToS3(stringifiedExpenses, filename); // ✅ Use imported service
+    // Ensure uploadToS3 is working correctly in your services
+    const fileURL = await uploadToS3(stringifiedExpenses, filename);
 
     return res.status(200).json({ link: fileURL, success: true });
   } catch (err) {
@@ -133,10 +113,4 @@ const downloadExpenses = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-module.exports = { addExpense, getExpense, deleteExpense ,downloadExpenses};
+module.exports = { addExpense, getExpense, deleteExpense, downloadExpenses };

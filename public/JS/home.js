@@ -74,7 +74,7 @@ function renderTable() {
 
     expenses.forEach(expense => {
         const row = document.createElement("tr");
-        row.dataset.id = expense.id; // for event delegation
+        row.dataset.id = expense._id; // deleting  uses _id
         row.innerHTML = `
             <td>${expense.amount}</td>
             <td>${expense.description}</td>

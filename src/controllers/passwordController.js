@@ -18,23 +18,25 @@ const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
 
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ error: 'User not found' });
 
         const id = uuidv4();
 
-        await ForgotPasswordRequest.create({
-            id,
-            UserId: user.id,
+        // Create reset request
+        // Ensure your ForgotPasswordModel has _id set to type String if you want to use UUIDs as IDs
+        const request = new ForgotPasswordRequest({
+            _id: id, // Explicitly setting _id if your schema allows string IDs
+            userId: user._id,
             isActive: true
         });
+        await request.save();
 
         const resetURL = `http://localhost:3000/password/resetpassword/${id}`;
 
-        // ✅ For testing - log URL to console
         console.log("Password reset URL:", resetURL);
 
-        // ✅ Send email using Brevo
+        // Send email using Brevo
         const sendSmtpEmail = new brevo.SendSmtpEmail();
         sendSmtpEmail.subject = "Password Reset Link";
         sendSmtpEmail.htmlContent = `<p>Click the link below to reset your password:</p><a href="${resetURL}">${resetURL}</a>`;
@@ -54,7 +56,7 @@ const forgotPassword = async (req, res) => {
 const getResetPasswordForm = async (req, res) => {
     try {
         const { id } = req.params;
-        const request = await ForgotPasswordRequest.findByPk(id);
+        const request = await ForgotPasswordRequest.findById(id);
 
         if (!request || !request.isActive) {
             return res.status(400).send('Invalid or expired reset link');
@@ -77,13 +79,13 @@ const postResetPassword = async (req, res) => {
         const { id } = req.params;
         const { newPassword } = req.body;
 
-        const request = await ForgotPasswordRequest.findByPk(id);
+        const request = await ForgotPasswordRequest.findById(id);
 
         if (!request || !request.isActive) {
             return res.status(400).send('Invalid or expired reset link');
         }
 
-        const user = await User.findByPk(request.UserId);
+        const user = await User.findById(request.userId);
 
         if (!user) {
             return res.status(404).send('User not found for this reset link');

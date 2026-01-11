@@ -1,27 +1,39 @@
-//src/middleware/auth.js
+// src/middleware/auth.js
+const jwt = require('jsonwebtoken');
+const User = require('../models/signupModel');
 
-const jwt = require("jsonwebtoken");
+const authenticate = async (req, res, next) => {
+    try {
+        // 1. Get the header
+        const authHeader = req.header('Authorization');
+        
+        if (!authHeader) {
+            return res.status(401).json({ error: "Authentication token missing" });
+        }
 
-const JWT_SECRET = process.env.JWT_SECRET; // same as in loginUser.js
+        // 2. Extract the token (Remove 'Bearer ' string)
+        // If the header is "Bearer abc123xyz", this leaves just "abc123xyz"
+        const token = authHeader.replace('Bearer ', '');
 
-const auth = (req, res, next) => {
-  const token = req.header("Authorization");
-  if (!token) {
-    return res.status(401).json({ error: "Access denied. No token provided." });
-  }
+        // 3. Verify token
+        const userObj = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // 4. Find user in MongoDB
+        const user = await User.findById(userObj.userId);
 
-  try {
-    const bearer = token.split(" ");
-    if (bearer.length !== 2 || bearer[0] !== "Bearer") {
-      return res.status(401).json({ error: "Invalid token format" });
+        if (!user) {
+            return res.status(401).json({ error: "User not found" });
+        }
+
+        // 5. Attach user to request
+        req.user = user; 
+        req.user.userId = user._id; // Standardize access to ID
+        next();
+
+    } catch (err) {
+        // console.error(err); // Optional: Un-comment to see full error details
+        return res.status(401).json({ success: false, message: "Authentication failed" });
     }
-
-    const decoded = jwt.verify(bearer[1], JWT_SECRET);
-    req.user = decoded; // contains userId, email
-    next();
-  } catch (err) {
-    res.status(400).json({ error: "Invalid token" });
-  }
 };
 
-module.exports = auth;
+module.exports = authenticate;
