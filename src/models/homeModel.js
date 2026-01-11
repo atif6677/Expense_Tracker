@@ -1,5 +1,4 @@
 // src/models/homeModel.js
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -18,9 +17,9 @@ const expenseSchema = new Schema({
     },
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'User', 
+        ref: 'User',
         required: true
     }
-}, { timestamps: true }); // ✅ THIS WAS MISSING
+}, { timestamps: true }); 
 
 module.exports = mongoose.model('Expense', expenseSchema);

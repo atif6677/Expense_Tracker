@@ -1,43 +1,32 @@
 // src/controllers/loginController.js
-
 const User = require("../models/signupModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const asyncHandler = require('../utils/asyncHandler');
+const AppError = require('../utils/appError');
 
-const JWT_SECRET = process.env.JWT_SECRET; 
-
-const loginUser = async (req, res) => {
-  try {
+const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+    
     if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+        throw new AppError("Email and password are required", 400);
     }
 
-    // check if user exists
-    const user = await User.findOne({ email }); // Removed 'where'
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+        throw new AppError("User not found", 404);
     }
 
-    // check if password matches
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Incorrect password" });
+        throw new AppError("Incorrect password", 401);
     }
 
-    // Generate JWT (Use _id for MongoDB)
-    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    res.status(200).json({
-      message: "Login successful",
-      token,
-    });
-  } catch (error) {
-       console.error('Login Error:', error);
-        res.status(500).json({ error: 'Failed to complete Login. Please try again later.' });
-  }
-};
+    res.status(200).json({ message: "Login successful", token });
+});
 
 module.exports = loginUser;

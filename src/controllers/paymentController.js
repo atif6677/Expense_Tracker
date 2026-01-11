@@ -1,83 +1,71 @@
 // src/controllers/paymentController.js
-
 const Order = require("../models/orderModel");
 const User = require("../models/signupModel");
 const cashfreeService = require("../services/cashfreeService");
+const asyncHandler = require('../utils/asyncHandler');
+const AppError = require('../utils/appError');
 
-// Create Premium Order
-const createPremiumOrder = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId);
-        if (!user) return res.status(404).json({ error: "User not found" });
+const createPremiumOrder = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
 
-        const orderId = `order_${Date.now()}`;
-        const orderAmount = 500.00;
+    const orderId = `order_${Date.now()}`;
+    const orderAmount = 500.00;
 
-        const paymentSessionId = await cashfreeService.createOrder(
+    const paymentSessionId = await cashfreeService.createOrder(
+        orderId,
+        orderAmount,
+        user._id.toString(),
+        user.phone || "9999999999",
+        user.email
+    );
+    if (!paymentSessionId) throw new AppError("Failed to create payment session", 500);
+
+    let order = await Order.findOne({ userId: user._id });
+    
+    if (order) {
+        order.orderId = orderId;
+        order.status = "PENDING";
+        await order.save();
+    } else {
+        order = new Order({
             orderId,
-            orderAmount,
-            user._id.toString(),
-            user.phone || "9999999999",
-            user.email
-        );
-        if (!paymentSessionId) throw new Error("Failed to create payment session");
-
-        // Check if order exists, otherwise create new
-        let order = await Order.findOne({ userId: user._id }); // Assuming userId field in Order model
-        
-        if (order) {
-            order.orderId = orderId;
-            order.status = "PENDING";
-            await order.save();
-        } else {
-            order = new Order({
-                orderId,
-                status: "PENDING",
-                userId: user._id
-            });
-            await order.save();
-        }
-
-        res.status(201).json({ order, payment_session_id: paymentSessionId });
-    } catch (err) {
-        console.error("Error in createPremiumOrder:", err);
-        res.status(500).json({ error: "Something went wrong while creating the order." });
+            status: "PENDING",
+            userId: user._id
+        });
+        await order.save();
     }
-};
 
-// Handle Success / Redirect
-const updateTransactionStatus = async (req, res) => {
-    try {
-        const order_id = req.query.order_id;
-        if (!order_id) return res.status(400).send("<h1>Order ID missing</h1>");
+    res.status(201).json({ order, payment_session_id: paymentSessionId });
+});
 
-        const order = await Order.findOne({ orderId: order_id });
-        if (!order) return res.status(404).send("<h1>Order not found</h1>");
+const updateTransactionStatus = asyncHandler(async (req, res) => {
+    const order_id = req.query.order_id;
+    if (!order_id) throw new AppError("Order ID missing", 400);
 
-        const user = await User.findById(order.userId);
-        if (!user) return res.status(404).send("<h1>User not found for this order</h1>");
+    const order = await Order.findOne({ orderId: order_id });
+    if (!order) throw new AppError("Order not found", 404);
 
-        const paymentStatus = await cashfreeService.getPaymentStatus(order_id);
+    const user = await User.findById(order.userId);
+    if (!user) throw new AppError("User not found for this order", 404);
 
-        if (paymentStatus === "SUCCESS" || paymentStatus === "PAID") {
-            // Update order
-            order.status = "SUCCESSFUL";
-            await order.save();
+    const paymentStatus = await cashfreeService.getPaymentStatus(order_id);
 
-            // Update user
-            user.isPremiumUser = true;
-            await user.save();
+    if (paymentStatus === "SUCCESS" || paymentStatus === "PAID") {
+        order.status = "SUCCESSFUL";
+        await order.save();
 
-            return res.redirect("http://localhost:3000/home.html");
-        } else {
-            order.status = "FAILED";
-            await order.save();
-            return res.redirect("http://localhost:3000/home.html");
-        }
-    } catch (err) {
-        console.error("Error in updateTransactionStatus:", err);
-        return res.status(500).send("<h1>Something went wrong while updating transaction.</h1>");
+        user.isPremiumUser = true;
+        await user.save();
+
+        return res.redirect("http://localhost:3000/home.html");
+    } else {
+        order.status = "FAILED";
+        await order.save();
+        return res.redirect("http://localhost:3000/home.html");
     }
-};
+});
 
 module.exports = { createPremiumOrder, updateTransactionStatus };

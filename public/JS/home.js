@@ -1,9 +1,8 @@
-// 🚫 Block unauthorized users
+// public/JS/home.js
 const token = localStorage.getItem("token");
 if (!token) {
   window.location.href = "./login.html";
 }
-
 
 let expenses = [];
 let currentPage = 1;
@@ -12,30 +11,24 @@ let totalPages = 1;
 
 async function home(event) {
     event.preventDefault();
-
     const amount = Number(document.querySelector("#amount").value);
     const description = document.querySelector("#description").value.trim();
     const category = document.querySelector("#category").value;
-    
     const token = localStorage.getItem("token");
-
 
     if (!amount || !description || !category) {
         return alert("Please fill all fields");
     }
 
-
     const expenseData = { amount, description, category };
-
 
     try {
         await axios.post("/home", expenseData, {
          headers: { Authorization: `Bearer ${token}` },
          }
         );
-
         alert("Expense added successfully");
-        await fetchExpenses(); // keep separate
+        await fetchExpenses();
     } catch (err) {
         console.error("Error:", err);
         alert(err.response?.data?.error || "Failed to add expense.");
@@ -52,8 +45,7 @@ async function fetchExpenses() {
         
         expenses = res.data.expenses || [];
         totalPages = res.data.totalPages || 1;
-
-        renderTable(); // render separately
+        renderTable();
     } catch (err) {
         console.error("Unable to fetch data", err);
         if (err.response) {
@@ -64,7 +56,7 @@ async function fetchExpenses() {
 
 function renderTable() {
     const tbody = document.getElementById("expenseList");
-    tbody.innerHTML = ""; // Clear previous entries
+    tbody.innerHTML = "";
 
     if (!expenses || expenses.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No expenses found.</td></tr>';
@@ -74,7 +66,7 @@ function renderTable() {
 
     expenses.forEach(expense => {
         const row = document.createElement("tr");
-        row.dataset.id = expense._id; // deleting  uses _id
+        row.dataset.id = expense._id; // ✅ FIXED: Uses _id
         row.innerHTML = `
             <td>${expense.amount}</td>
             <td>${expense.description}</td>
@@ -91,7 +83,6 @@ function updatePageInfo() {
     document.querySelector("#pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
 }
 
-/*  deleteExpense logic */
 async function deleteExpense(id) { 
     const token = localStorage.getItem("token");
     if (!confirm("Are you sure you want to delete this expense?")) return;
@@ -100,11 +91,7 @@ async function deleteExpense(id) {
         await axios.delete(`/home/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
-
-        // Re-fetch to update table
         await fetchExpenses();
-
-        // If page is empty after deletion → go back one page
         if (expenses.length === 0 && currentPage > 1) {
             currentPage--;
             await fetchExpenses();
@@ -115,7 +102,6 @@ async function deleteExpense(id) {
     }
 }
 
-/* Use Event Delegation for Delete Buttons */
 document.getElementById("expenseList").addEventListener("click", async e => {
     if (e.target.classList.contains("delete-btn")) {
         const row = e.target.closest("tr");
@@ -124,13 +110,11 @@ document.getElementById("expenseList").addEventListener("click", async e => {
     }
 });
 
-/* Pagination controls */
 document.getElementById("rowsPerPage").addEventListener("change", async e => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
     await fetchExpenses();
 });
-
 
 document.getElementById("prevBtn").addEventListener("click", async () => {
     if (currentPage > 1) {
@@ -153,8 +137,6 @@ async function display() {
 
 display();
 
-
-//check user is premium or not
 async function checkPremiumStatus(redirectIfNotPremium = false) {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -173,12 +155,10 @@ async function checkPremiumStatus(redirectIfNotPremium = false) {
     const reportLink = document.querySelector('a[href="./report.html"]');
 
     if (status === "SUCCESSFUL") {
-      // ✅ Premium user
       if (buyBtn) buyBtn.style.display = "none";
       leaderboardLink?.classList.remove("disabled-link");
       reportLink?.classList.remove("disabled-link");
 
-      // 🌟 Add "Premium User" text (only once)
       if (!document.querySelector(".premium-badge")) {
         const badge = document.createElement("span");
         badge.textContent = "🌟 Premium User";
@@ -186,9 +166,7 @@ async function checkPremiumStatus(redirectIfNotPremium = false) {
         document.querySelector(".nav-actions").prepend(badge);
       }
     } else {
-      // 🚫 Non-premium user
       if (buyBtn) buyBtn.style.display = "inline-block";
-
       [leaderboardLink, reportLink].forEach(link => {
         if (link) {
           link.classList.add("disabled-link");
@@ -209,21 +187,14 @@ async function checkPremiumStatus(redirectIfNotPremium = false) {
   }
 }
 
-
-
-
-/* BUY PREMIUM BUTTON */
 document.getElementById("renderBtn").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
-
     try {
         const res = await axios.get("/payment/premium", {
             headers: { "Authorization": `Bearer ${token}` }
         });
-
         const { payment_session_id } = res.data;
         if (!payment_session_id) throw new Error("Failed to create payment session");
-
         const cashfree = new Cashfree({ mode: "sandbox" });
         cashfree.checkout({ paymentSessionId: payment_session_id });
     } catch (err) {
@@ -232,24 +203,20 @@ document.getElementById("renderBtn").addEventListener("click", async () => {
     }
 });
 
-/* LOGOUT BUTTON */
 document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "/login.html";
 });
 
-/* DOWNLOAD EXPENSES */
 document.getElementById("downloadExpences").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
     try {
         const linkexpenses = await axios.get("/home/download", {
             headers: { "Authorization": `Bearer ${token}` }
         });
-
         if (linkexpenses.status === 200) {
             window.location.href = linkexpenses.data.link;
         }
-
     } catch (error) {
         console.error(error);
     }

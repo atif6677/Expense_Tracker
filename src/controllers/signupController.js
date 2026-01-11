@@ -1,52 +1,38 @@
 // src/controllers/signupController.js
-
 const User = require("../models/signupModel");
 const bcrypt = require("bcrypt");
+const asyncHandler = require('../utils/asyncHandler');
+const AppError = require('../utils/appError');
 
 const saltRounds = 10; 
 
-const addUserSignup = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        
-        // 1. Basic Validation Check
-        if (!name || !email || !password) {
-            return res.status(400).json({ error: "All fields are required" });
-        }
-        
-        // 2. Check if email already exists
-        const existingUser = await User.findOne({ email }); // Mongoose syntax
-        if (existingUser) {
-            return res.status(409).json({ error: "User already exists" });
-        }
-
-        // 3. Hash the password
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        // 4. Create the new user
-        const user = new User({ 
-            name, 
-            email, 
-            password: hashedPassword,
-            totalExpenses: 0 // Initialize defaults if not set in schema
-        });
-        
-        await user.save();
-        
-        // 5. Success Response
-        res.status(201).json({
-            message: "New user added successfully",
-            user: {
-                id: user._id, // MongoDB uses _id
-                name: user.name,
-                email: user.email
-            }
-        });
-
-    } catch (error) {
-        console.error('Signup Error:', error);
-        res.status(500).json({ error: 'Failed to complete signup. Please try again later.' });
+const addUserSignup = asyncHandler(async (req, res) => {
+    const { name, email, password } = req.body;
+    
+    if (!name || !email || !password) {
+        throw new AppError("All fields are required", 400);
     }
-};
+    
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        throw new AppError("User already exists", 409);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const user = new User({ 
+        name, 
+        email, 
+        password: hashedPassword,
+        totalExpenses: 0 
+    });
+    
+    await user.save();
+    
+    res.status(201).json({
+        message: "New user added successfully",
+        user: { id: user._id, name: user.name, email: user.email }
+    });
+});
 
 module.exports = addUserSignup;
