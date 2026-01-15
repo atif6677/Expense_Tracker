@@ -12,7 +12,7 @@ const orderSchema = new Schema({
         type: String,
         required: true
     },
-    paymentid: String, // Store payment ID if needed
+    paymentid: String, 
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',

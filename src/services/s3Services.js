@@ -18,10 +18,10 @@ function uploadToS3(data, filename) {
 
     s3.upload(params, (err, result) => {
       if (err) {
-        console.error('❌ S3 Upload Error:', err);
+        console.error(' S3 Upload Error:', err);
         reject(err);
       } else {
-        console.log('✅ S3 Upload Success:', result.Location);
+        console.log(' S3 Upload Success:', result.Location);
         resolve(result.Location);
       }
     });

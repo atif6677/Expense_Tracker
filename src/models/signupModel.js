@@ -17,7 +17,7 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    isPremiumUser: { // Often needed for expense trackers
+    isPremiumUser: {
         type: Boolean,
         default: false
     },

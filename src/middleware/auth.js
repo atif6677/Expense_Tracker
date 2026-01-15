@@ -5,7 +5,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
 
 const authenticate = asyncHandler(async (req, res, next) => {
-    // 1. Get the header
+
     const authHeader = req.header('Authorization');
     
     if (!authHeader) {
@@ -15,10 +15,6 @@ const authenticate = asyncHandler(async (req, res, next) => {
     // 2. Extract the token (Remove 'Bearer ' string)
     const token = authHeader.replace('Bearer ', '');
 
-    // 3. Verify token
-    // jwt.verify throws a standard error if invalid, which asyncHandler catches.
-    // If you want a custom message for invalid tokens, the errorMiddleware 
-    // can be tweaked, or we let the generic 500/401 handle it.
     let userObj;
     try {
         userObj = jwt.verify(token, process.env.JWT_SECRET);

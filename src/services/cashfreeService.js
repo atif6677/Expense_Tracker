@@ -59,7 +59,7 @@ const getPaymentStatus = async (orderId) => {
   }
 };
 
-// ✅ Export all at the end
+
 module.exports = {
   createOrder,
   getPaymentStatus

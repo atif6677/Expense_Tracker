@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const forgotPasswordSchema = new Schema({
-    _id: { // If you generate your own UUIDs for links, keep this. If not, remove it to let Mongo use its own IDs.
+    _id: { // To generate your own UUIDs for links, Cause it is more secure.
         type: String, 
         required: true 
     },

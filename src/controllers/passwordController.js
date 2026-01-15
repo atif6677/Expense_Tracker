@@ -27,9 +27,6 @@ const forgotPassword = asyncHandler(async (req, res) => {
     // Generate a UUID for the reset link
     const id = uuidv4();
 
-    // Create reset request
-    // Note: We manually set _id to the UUID string here because your 
-    // ForgotPasswordModel is defined with `_id: { type: String }`
     const request = new ForgotPasswordRequest({
         _id: id, 
         userId: user._id,
