@@ -29,6 +29,7 @@ async function home(event) {
         );
         alert("Expense added successfully");
         await fetchExpenses();
+        event.target.reset();
     } catch (err) {
         console.error("Error:", err);
         alert(err.response?.data?.error || "Failed to add expense.");
@@ -66,7 +67,7 @@ function renderTable() {
 
     expenses.forEach(expense => {
         const row = document.createElement("tr");
-        row.dataset.id = expense._id; // ✅ FIXED: Uses _id
+        row.dataset.id = expense._id; 
         row.innerHTML = `
             <td>${expense.amount}</td>
             <td>${expense.description}</td>

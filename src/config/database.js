@@ -1,4 +1,4 @@
-// src/utils/database.js
+// src/config/database.js
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
@@ -21,4 +21,4 @@ const connectDB = async () => {
     }
 };
 
-module.exports = connectDB;
+module.exports = { connectDB };

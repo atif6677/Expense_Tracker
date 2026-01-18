@@ -10,7 +10,6 @@
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.1.2",
-    "stripe": "^18.5.0",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

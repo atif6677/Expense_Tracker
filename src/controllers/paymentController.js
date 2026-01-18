@@ -1,15 +1,14 @@
 // src/controllers/paymentController.js
-const Order = require("../models/orderModel");
-const User = require("../models/signupModel");
+
+const { Order } = require("../models/orderModel");
+const { User } = require("../models/signupModel");
 const cashfreeService = require("../services/cashfreeService");
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
 
-const createPremiumOrder = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.userId);
-    if (!user) {
-        throw new AppError("User not found", 404);
-    }
+exports.createPremiumOrder = asyncHandler(async (req, res) => {
+    // OPTIMIZED: Use req.user directly (Auth middleware already fetched it)
+    const user = req.user;
 
     const orderId = `order_${Date.now()}`;
     const orderAmount = 500.00;
@@ -41,13 +40,14 @@ const createPremiumOrder = asyncHandler(async (req, res) => {
     res.status(201).json({ order, payment_session_id: paymentSessionId });
 });
 
-const updateTransactionStatus = asyncHandler(async (req, res) => {
+exports.updateTransactionStatus = asyncHandler(async (req, res) => {
     const order_id = req.query.order_id;
     if (!order_id) throw new AppError("Order ID missing", 400);
 
     const order = await Order.findOne({ orderId: order_id });
     if (!order) throw new AppError("Order not found", 404);
 
+    // This is needed because this route is a callback without Auth headers
     const user = await User.findById(order.userId);
     if (!user) throw new AppError("User not found for this order", 404);
 
@@ -67,5 +67,3 @@ const updateTransactionStatus = asyncHandler(async (req, res) => {
         return res.redirect("http://localhost:3000/home.html");
     }
 });
-
-module.exports = { createPremiumOrder, updateTransactionStatus };

@@ -1,12 +1,13 @@
 // src/controllers/signupController.js
-const User = require("../models/signupModel");
+
+const { User } = require("../models/signupModel");
 const bcrypt = require("bcrypt");
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
 
 const saltRounds = 10; 
 
-const addUserSignup = asyncHandler(async (req, res) => {
+exports.addUserSignup = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
     
     if (!name || !email || !password) {
@@ -34,5 +35,3 @@ const addUserSignup = asyncHandler(async (req, res) => {
         user: { id: user._id, name: user.name, email: user.email }
     });
 });
-
-module.exports = addUserSignup;

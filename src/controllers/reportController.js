@@ -1,5 +1,7 @@
 // src/controllers/reportController.js
-const Expense = require('../models/homeModel');
+
+// src/controllers/reportController.js
+const { Expense } = require("../models/homeModel");
 const { Parser } = require('json2csv');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
@@ -27,7 +29,7 @@ const getDateCondition = (filter, date, month, year) => {
     return dateCondition;
 };
 
-const getReportExpenses = asyncHandler(async (req, res) => {
+exports.getReportExpenses = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -54,7 +56,7 @@ const getReportExpenses = asyncHandler(async (req, res) => {
     res.status(200).json(responseData);
 });
 
-const downloadExpenses = asyncHandler(async (req, res) => {
+exports.downloadExpenses = asyncHandler(async (req, res) => {
     const { filter, date, month, year, salary } = req.query;
     const dateCondition = getDateCondition(filter, date, month, year);
     const whereClause = { userId: req.user.userId, ...dateCondition };
@@ -87,5 +89,3 @@ const downloadExpenses = asyncHandler(async (req, res) => {
     res.attachment("expense_report.csv");
     return res.send(csv);
 });
-
-module.exports = { getReportExpenses, downloadExpenses };

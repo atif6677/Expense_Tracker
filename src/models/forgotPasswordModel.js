@@ -18,4 +18,6 @@ const forgotPasswordSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('ForgotPasswordRequest', forgotPasswordSchema);
+const ForgotPasswordRequest = mongoose.model("ForgotPasswordRequest", forgotPasswordSchema);
+
+module.exports = { ForgotPasswordRequest };

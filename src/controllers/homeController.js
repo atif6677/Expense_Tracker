@@ -1,11 +1,11 @@
 // src/controllers/homeController.js
-const Expense = require('../models/homeModel');
-const User = require('../models/signupModel'); 
+
+const { Expense } = require("../models/homeModel");
 const { uploadToS3 } = require('../services/s3Services'); 
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
 
-const addExpense = asyncHandler(async (req, res) => {
+exports.addExpense = asyncHandler(async (req, res) => {
     const { amount, description, category } = req.body;
     const userId = req.user.userId;
 
@@ -21,16 +21,16 @@ const addExpense = asyncHandler(async (req, res) => {
     });
     await expense.save();
 
-    const user = await User.findById(userId);
-    if (user) {
-        user.totalExpenses = (user.totalExpenses || 0) + Number(amount);
-        await user.save();
+    // OPTIMIZED: Use req.user directly instead of fetching User again
+    if (req.user) {
+        req.user.totalExpenses = (req.user.totalExpenses || 0) + Number(amount);
+        await req.user.save();
     }
 
     res.status(201).json({ message: "Expense added successfully", expense });
 });
 
-const getExpense = asyncHandler(async (req, res) => {
+exports.getExpense = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -51,7 +51,7 @@ const getExpense = asyncHandler(async (req, res) => {
     });
 });
 
-const deleteExpense = asyncHandler(async (req, res) => {
+exports.deleteExpense = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const userId = req.user.userId;
 
@@ -64,16 +64,16 @@ const deleteExpense = asyncHandler(async (req, res) => {
     const expenseAmount = expense.amount;
     await Expense.deleteOne({ _id: id });
 
-    const user = await User.findById(userId);
-    if (user) {
-        user.totalExpenses = (user.totalExpenses || 0) - expenseAmount;
-        await user.save();
+    // OPTIMIZED: Use req.user directly
+    if (req.user) {
+        req.user.totalExpenses = (req.user.totalExpenses || 0) - expenseAmount;
+        await req.user.save();
     }
 
     res.status(200).json({ message: "Expense deleted successfully" });
 });
 
-const downloadExpenses = asyncHandler(async (req, res) => {
+exports.downloadExpenses = asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const expenses = await Expense.find({ userId }).lean();
 
@@ -84,5 +84,3 @@ const downloadExpenses = asyncHandler(async (req, res) => {
 
     return res.status(200).json({ link: fileURL, success: true });
 });
-
-module.exports = { addExpense, getExpense, deleteExpense, downloadExpenses };

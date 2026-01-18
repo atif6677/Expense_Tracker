@@ -1,11 +1,11 @@
 // src/controllers/loginController.js
-const User = require("../models/signupModel");
+const { User } = require("../models/signupModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
 
-const loginUser = asyncHandler(async (req, res) => {
+exports.loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     
     if (!email || !password) {
@@ -28,5 +28,3 @@ const loginUser = asyncHandler(async (req, res) => {
 
     res.status(200).json({ message: "Login successful", token });
 });
-
-module.exports = loginUser;
