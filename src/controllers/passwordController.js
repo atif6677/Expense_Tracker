@@ -4,15 +4,9 @@ const { User } = require("../models/signupModel");
 const { ForgotPasswordRequest } = require("../models/forgotPasswordModel");
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
-const brevo = require('@getbrevo/brevo');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
-
-const apiInstance = new brevo.TransactionalEmailsApi();
-apiInstance.setApiKey(
-    brevo.TransactionalEmailsApiApiKeys.apiKey,
-    process.env.BREVO_API_KEY
-);
+const { sendEmail } = require('../services/emailService');
 
 exports.forgotPassword = asyncHandler(async (req, res) => {
     const { email } = req.body;
@@ -27,17 +21,23 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
     });
     await request.save();
 
-    const resetURL = `http://localhost:3000/password/resetpassword/${id}`;
+    // Use dynamic base URL for production readiness
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const resetURL = `${baseUrl}/password/resetpassword/${id}`;
     
-    // Log removed for production security
-
-    const sendSmtpEmail = new brevo.SendSmtpEmail();
-    sendSmtpEmail.subject = "Password Reset Link";
-    sendSmtpEmail.htmlContent = `<p>Click the link below to reset your password:</p><a href="${resetURL}">${resetURL}</a>`;
-    sendSmtpEmail.sender = { name: "Expense Tracker", email: "noreply@expensetracker.com" };
-    sendSmtpEmail.to = [{ email: user.email }];
-
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    // ✅ Use the clean email service
+    await sendEmail({
+        toEmail: user.email,
+        toName: user.name,
+        subject: "Password Reset Link",
+        htmlContent: `
+            <p>Hi ${user.name},</p>
+            <p>You requested a password reset.</p>
+            <p>Click the link below to reset your password:</p>
+            <a href="${resetURL}">${resetURL}</a>
+            <p>If you did not request this, please ignore this email.</p>
+        `
+    });
 
     res.json({ message: 'Password reset link has been sent to your email' });
 });
