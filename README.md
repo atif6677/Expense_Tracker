@@ -1,12 +1,3 @@
-## ⚠️ Important Note on Email Services
-
-This project uses **Brevo (formerly Sendinblue)** for sending transactional emails (e.g., password resets). 
-
-> **Note for Developers:** > To ensure successful email delivery in a production environment, Brevo requires a **verified sender domain**. If you are running this locally with a free account and an unverified domain (e.g., using a generic Gmail address as the sender), emails may be blocked or land in the spam folder. 
-> 
-> For testing purposes without a domain, consider replacing the `brevo` service with `nodemailer` or ensuring your sender identity is fully verified on the Brevo dashboard.
-
-
 # 💰 Expense Tracker Application
 
 A full-stack web application that allows users to manage their personal finances securely. Users can track daily expenses, view reports, and upgrade to a **Premium Membership** to access exclusive features like the **Leaderboard** and **Downloadable Reports**.
@@ -35,7 +26,7 @@ A full-stack web application that allows users to manage their personal finances
 * **Database:** MongoDB Atlas (Mongoose ODM)
 * **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
 * **Authentication:** JSON Web Tokens (JWT)
-* **File Storage:** AWS S3 (for report downloads)
+* **File Storage:** AWS S3 (for expense downloads)
 * **Email Service:** Brevo (formerly Sendinblue)
 * **Payments:** Cashfree
 
