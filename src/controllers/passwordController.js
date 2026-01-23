@@ -1,5 +1,3 @@
-// src/controllers/passwordController.js
-
 const { User } = require("../models/signupModel");
 const { ForgotPasswordRequest } = require("../models/forgotPasswordModel");
 const bcrypt = require('bcrypt');
@@ -21,11 +19,10 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
     });
     await request.save();
 
-    // Use dynamic base URL for production readiness
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-    const resetURL = `${baseUrl}/password/resetpassword/${id}`;
+
+    const serverUrl = process.env.SERVER_URL || 'http://localhost:3000';
+    const resetURL = `${serverUrl}/password/resetpassword/${id}`;
     
-    // ✅ Use the clean email service
     await sendEmail({
         toEmail: user.email,
         toName: user.name,

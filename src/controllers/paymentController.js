@@ -1,5 +1,3 @@
-// src/controllers/paymentController.js
-
 const { Order } = require("../models/orderModel");
 const { User } = require("../models/signupModel");
 const cashfreeService = require("../services/cashfreeService");
@@ -7,7 +5,6 @@ const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/appError');
 
 exports.createPremiumOrder = asyncHandler(async (req, res) => {
-    // OPTIMIZED: Use req.user directly (Auth middleware already fetched it)
     const user = req.user;
 
     const orderId = `order_${Date.now()}`;
@@ -47,11 +44,13 @@ exports.updateTransactionStatus = asyncHandler(async (req, res) => {
     const order = await Order.findOne({ orderId: order_id });
     if (!order) throw new AppError("Order not found", 404);
 
-    // This is needed because this route is a callback without Auth headers
     const user = await User.findById(order.userId);
     if (!user) throw new AppError("User not found for this order", 404);
 
     const paymentStatus = await cashfreeService.getPaymentStatus(order_id);
+
+    
+    const serverUrl = process.env.SERVER_URL || "http://localhost:3000";
 
     if (paymentStatus === "SUCCESS" || paymentStatus === "PAID") {
         order.status = "SUCCESSFUL";
@@ -60,10 +59,10 @@ exports.updateTransactionStatus = asyncHandler(async (req, res) => {
         user.isPremiumUser = true;
         await user.save();
 
-        return res.redirect("http://localhost:3000/home.html");
+        return res.redirect(`${serverUrl}/home.html`);
     } else {
         order.status = "FAILED";
         await order.save();
-        return res.redirect("http://localhost:3000/home.html");
+        return res.redirect(`${serverUrl}/home.html`);
     }
 });
