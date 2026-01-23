@@ -9,12 +9,15 @@ const errorHandler = require("./middleware/errorMiddleware");
 
 const app = express();
 
+// This tells Express to trust the proxy (Render) so rateLimit works correctly
+app.set('trust proxy', 1); 
+
 // We disable contentSecurityPolicy so external scripts (Axios, Cashfree, Chart.js) work correctly.
 app.use(helmet({
   contentSecurityPolicy: false, 
 }));
 
-// 2. Apply Rate Limiting
+// Apply Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, 
   max: 200, 
@@ -22,7 +25,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// 3. Standard Middleware
+// Standard Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
@@ -31,7 +34,7 @@ app.get('/', (req, res) => {
     res.redirect('/login.html');
 });
 
-// ✅ Routes (Clean & Organized)
+// Routes (Clean & Organized)
 app.use("/", require("./routes/signupRoute"));
 app.use("/", require("./routes/loginRoute"));
 app.use("/", require("./routes/homeRoute"));
